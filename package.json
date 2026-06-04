@@ -1,0 +1,48 @@
+{
+  "name": "@shapeshift-labs/frontier-lang",
+  "version": "0.1.0",
+  "description": "Patch-native semantic source kernel for replayable programs, merge admission, and generated TypeScript projections.",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "examples",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "test": "npm run build && node test/smoke.mjs",
+    "prepare": "npm run build",
+    "prepack": "npm test"
+  },
+  "keywords": [
+    "frontier",
+    "semantic-merge",
+    "patch",
+    "replay",
+    "compiler",
+    "typescript"
+  ],
+  "author": "ShapeShift Labs",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/siliconjungle/-shapeshift-labs-frontier-lang.git"
+  },
+  "bugs": {
+    "url": "https://github.com/siliconjungle/-shapeshift-labs-frontier-lang/issues"
+  },
+  "homepage": "https://github.com/siliconjungle/-shapeshift-labs-frontier-lang#readme",
+  "publishConfig": {
+    "access": "public"
+  }
+}

@@ -1,7 +1,7 @@
 {
   "name": "@shapeshift-labs/frontier-lang",
-  "version": "0.1.0",
-  "description": "Patch-native semantic source kernel for replayable programs, merge admission, and generated TypeScript projections.",
+  "version": "0.2.0",
+  "description": "Umbrella package for Frontier Lang kernel, parser, checker, and TypeScript projection packages.",
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -30,7 +30,9 @@
     "patch",
     "replay",
     "compiler",
-    "typescript"
+    "typescript",
+    "parser",
+    "checker"
   ],
   "author": "ShapeShift Labs",
   "license": "MIT",
@@ -44,5 +46,11 @@
   "homepage": "https://github.com/siliconjungle/-shapeshift-labs-frontier-lang#readme",
   "publishConfig": {
     "access": "public"
+  },
+  "dependencies": {
+    "@shapeshift-labs/frontier-lang-kernel": "^0.1.1",
+    "@shapeshift-labs/frontier-lang-parser": "^0.1.0",
+    "@shapeshift-labs/frontier-lang-checker": "^0.1.0",
+    "@shapeshift-labs/frontier-lang-typescript": "^0.1.0"
   }
 }

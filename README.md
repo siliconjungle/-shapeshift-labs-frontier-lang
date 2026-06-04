@@ -1,12 +1,8 @@
 # `@shapeshift-labs/frontier-lang`
 
-Patch-native semantic source kernel for replayable programs, merge admission, and generated TypeScript projections.
+Umbrella package for the Frontier Lang package family.
 
-This package is the first small slice of a Frontier-oriented language idea:
-
-> Source is semantic state. Editing is patches. Compilation is projection. Merge is replay plus proof/evidence.
-
-The package does not try to be a full programming language yet. It provides the runtime-neutral source graph and compiler contracts that a concrete `.frontier` parser can target later.
+Frontier Lang is a patch-native semantic programming model: source is a replayable semantic graph, edits are structured patches, merge admission is evidence-aware, and generated code is a projection from that semantic state.
 
 ## Install
 
@@ -14,192 +10,83 @@ The package does not try to be a full programming language yet. It provides the 
 npm install @shapeshift-labs/frontier-lang
 ```
 
-The package is ESM-first and dependency-free at runtime. Local checkout examples import from `dist`, so run `npm run build` before running files under `examples/`.
+The root package re-exports the browser-safe runtime packages:
 
-## Why
+- `@shapeshift-labs/frontier-lang-kernel`: semantic document graph, patches, replay, hashing, and merge admission.
+- `@shapeshift-labs/frontier-lang-parser`: first `.frontier` syntax slice.
+- `@shapeshift-labs/frontier-lang-checker`: diagnostics for documents and patch evidence.
+- `@shapeshift-labs/frontier-lang-typescript`: TypeScript projection adapter.
 
-Git merges text. Large agent swarms make concurrent semantic changes: APIs, state cells, routes, effects, migrations, tests, generated artifacts, and ownership surfaces.
+The Node CLI is intentionally separate:
 
-`frontier-lang` models those as typed graph nodes and semantic patch bundles so tooling can classify a merge before it becomes a pile of conflicting files.
+```sh
+npm install -g @shapeshift-labs/frontier-lang-cli
+frontier-lang check examples/todo.frontier
+```
 
 ## Example
 
-```ts
+```js
 import {
-  actionNode,
+  checkDocument,
   classifyMerge,
-  createDocument,
   createPatch,
   emitTypeScript,
-  entityNode,
   hashDocumentBase,
-  stateNode
+  parseFrontierSource
 } from "@shapeshift-labs/frontier-lang";
 
-const todo = entityNode({
-  id: "ent_todo",
-  name: "Todo",
-  fields: [
-    { id: "field_todo_id", name: "id", type: "TodoId", key: true },
-    { id: "field_todo_title", name: "title", type: "Text", merge: { kind: "conflict" } },
-    {
-      id: "field_todo_tags",
-      name: "tags",
-      type: "Set<Text>",
-      merge: { kind: "union", law: "semilattice" }
-    }
-  ]
-});
+const document = parseFrontierSource(`
+module TodoApp @id("mod_todo")
 
-const state = stateNode({
-  id: "state_todo",
-  name: "TodoDb",
-  collections: [
-    {
-      id: "collection_todos",
-      name: "todos",
-      type: "Map<TodoId, Todo>",
-      merge: { kind: "byKey", law: "commutative" }
-    }
-  ]
-});
-
-const addTodo = actionNode({
-  id: "action_add_todo",
-  name: "addTodo",
-  input: "{ title: Text }",
-  returns: "Patch",
-  reads: ["TodoDb.todos"],
-  writes: ["TodoDb.todos"],
-  uses: ["Clock"]
-});
-
-const document = createDocument({
-  id: "mod_todo",
-  name: "TodoApp",
-  nodes: [todo, state, addTodo]
-});
-
-const baseHash = hashDocumentBase(document);
-
-const left = createPatch({
-  id: "patch_add_tags",
-  baseHash,
-  operations: [
-    {
-      op: "updateNode",
-      id: "ent_todo",
-      set: { metadata: { changedBy: "left" } },
-      touches: [{ id: "field_todo_tags", access: "write" }]
-    }
-  ],
-  evidence: [{ id: "test_tags", kind: "test", status: "passed" }]
-});
-
-const right = createPatch({
-  id: "patch_add_more_tags",
-  baseHash,
-  operations: [
-    {
-      op: "updateNode",
-      id: "ent_todo",
-      set: { metadata: { changedBy: "right" } },
-      touches: [{ id: "field_todo_tags", access: "write" }]
-    }
-  ],
-  evidence: [{ id: "test_more_tags", kind: "test", status: "passed" }]
-});
-
-console.log(classifyMerge(document, left, right).status);
-// safe-by-merge-law
-
-console.log(emitTypeScript(document));
-```
-
-## Concrete Language Shape
-
-A later parser could project source that looks like this into the graph above. This is future syntax, not a shipped parser yet:
-
-```frontier
 entity Todo @id("ent_todo") {
-  id @id("field_todo_id"): TodoId @key
-
-  title @id("field_todo_title"): Text {
+  title @id("field_title"): Text {
     merge conflict
   }
-
-  tags @id("field_todo_tags"): Set<Text> {
+  tags @id("field_tags"): Set<Text> {
     merge union law semilattice
   }
 }
+`);
 
-state TodoDb @id("state_todo") {
-  todos @id("collection_todos"): Map<TodoId, Todo> {
-    merge byKey law commutative
-  }
-}
-
-action addTodo(input: { title: Text })
-  reads TodoDb.todos
-  writes TodoDb.todos
-  uses Clock
-  returns Patch
-{
-  patch {
-    TodoDb.todos[TodoId.new()] = Todo {
-      title: input.title
-      tags: Set.empty()
+const baseHash = hashDocumentBase(document);
+const left = createPatch({
+  id: "left",
+  baseHash,
+  operations: [
+    {
+      op: "addEvidence",
+      evidence: { id: "left-test", kind: "test", status: "passed" },
+      touches: [{ id: "field_tags", access: "write" }]
     }
-  }
-}
+  ]
+});
+const right = createPatch({
+  id: "right",
+  baseHash,
+  operations: [
+    {
+      op: "addEvidence",
+      evidence: { id: "right-test", kind: "test", status: "passed" },
+      touches: [{ id: "field_tags", access: "write" }]
+    }
+  ]
+});
+
+console.log(checkDocument(document).ok);
+console.log(classifyMerge(document, left, right).status);
+console.log(emitTypeScript(document));
 ```
 
-## Generated Outputs And Host Capabilities
+## Package Shape
 
-There are two separate boundaries to keep distinct:
+The split packages keep package boundaries explicit:
 
-1. **JS/TS as optional projection targets.** Frontier semantic source can do the graph, replay, and merge work first, then project generated targets. This package currently ships `emitTypeScript`; JavaScript can be a later projection target or a build output derived from generated TypeScript. In this mode, JS packages are not part of the canonical source model.
-2. **JS packages as host capabilities.** Some real systems still need React, Playwright, SQLite clients, storage SDKs, crypto libraries, or browser APIs. The language can use those through explicit capability adapters such as `Network`, `Storage<T>`, `ReactView`, or `SqlClient`.
+- Kernel stays runtime-neutral and dependency-light.
+- Parser depends on kernel.
+- Checker depends on kernel.
+- TypeScript projection depends on kernel.
+- CLI depends on all of the above and owns Node filesystem/bin behavior.
+- Umbrella depends on the browser-safe packages and re-exports them for convenience.
 
-The second mode should be opt-in. Importing arbitrary JS directly into semantic source would pull late-bound JavaScript behavior back into the merge problem. A better design is:
-
-Future syntax sketch:
-
-```frontier
-capability ReactView from npm("react") {
-  effects dom
-  boundary generated
-}
-```
-
-Today, the source-kernel shape for this is an effect/capability contract: actions list capabilities in `uses`, effect nodes name the capability and resources, and target nodes describe generated output. The host adapter resolves `npm:react` or browser APIs outside the canonical semantic graph.
-
-That keeps JS useful without making JavaScript the canonical language semantics.
-
-## API Surface
-
-- `createDocument`
-- `entityNode`, `stateNode`, `actionNode`, `viewNode`, `migrationNode`, `effectNode`, `moduleNode`, `targetNode`
-- `createPatch`
-- `applySemanticPatch`
-- `replayDocument`
-- `classifyMerge`
-- `emitTypeScript`
-- `stableStringify`
-- `hashSemanticValue`
-- `hashDocumentBase`
-- `validateDocument`
-
-## Status
-
-Experimental. This is the source-kernel package for proving the core loop:
-
-```txt
-semantic source graph -> patch/replay -> merge classification -> generated TypeScript
-```
-
-The next layers are a concrete `.frontier` parser, richer compiler targets, verifier hooks, and adapters to the existing Frontier package family.
-
-## License
-
-MIT. See [LICENSE](./LICENSE).
+This keeps JavaScript/TypeScript useful as projection targets without making generated code the canonical source model.

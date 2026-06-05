@@ -3,6 +3,7 @@ import {
   applySemanticPatch,
   checkDocument,
   classifyMerge,
+  compileNativeSource,
   compileFrontierSource,
   createUniversalAstFromDocument,
   createPatch,
@@ -120,3 +121,11 @@ assert.equal(readUniversalAstJson(writeUniversalAstJson(universalAst)).kind, "fr
 const nativeImport = importNativeSource({ language: "python", sourcePath: "todo.py" });
 assert.equal(nativeImport.nativeSource.language, "python");
 assert.equal(nativeImport.universalAst.kind, "frontier.lang.universalAst");
+const nativeCompile = compileNativeSource({
+  language: "javascript",
+  sourcePath: "runtime.js",
+  sourceText: "export function step(frame) { return frame + 1; }\n"
+});
+assert.equal(nativeCompile.kind, "frontier.lang.nativeSourceCompileResult");
+assert.equal(nativeCompile.outputMode, "preserved-source");
+assert.match(nativeCompile.output, /export function step/);

@@ -2,3 +2,8 @@ export * from "@shapeshift-labs/frontier-lang-kernel";
 export * from "@shapeshift-labs/frontier-lang-parser";
 export * from "@shapeshift-labs/frontier-lang-checker";
 export * from "@shapeshift-labs/frontier-lang-typescript";
+export * from "@shapeshift-labs/frontier-lang-javascript";
+export * from "@shapeshift-labs/frontier-lang-rust";
+export * from "@shapeshift-labs/frontier-lang-python";
+export * from "@shapeshift-labs/frontier-lang-c";
+export * from "@shapeshift-labs/frontier-lang-compiler";

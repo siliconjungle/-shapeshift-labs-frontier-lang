@@ -4,6 +4,7 @@ import {
   checkDocument,
   classifyMerge,
   compileFrontierSource,
+  createUniversalAstFromDocument,
   createPatch,
   emitCHeader,
   emitJavaScript,
@@ -14,8 +15,10 @@ import {
   importNativeSource,
   parseFrontierSource,
   projectFrontierAst,
+  readUniversalAstJson,
   renderTargetAst,
-  toTypeScriptAst
+  toTypeScriptAst,
+  writeUniversalAstJson
 } from "../dist/index.js";
 
 const source = `
@@ -112,4 +115,8 @@ assert.match(emitRust(document), /pub struct Todo/);
 assert.match(emitPython(document), /class Todo/);
 assert.match(emitCHeader(document), /typedef struct Todo/);
 assert.match(compileFrontierSource(source, { target: "javascript" }).output, /export const TodoSchema/);
-assert.equal(importNativeSource({ language: "python", sourcePath: "todo.py" }).nativeSource.language, "python");
+const universalAst = createUniversalAstFromDocument(document, { id: "uast_todo" });
+assert.equal(readUniversalAstJson(writeUniversalAstJson(universalAst)).kind, "frontier.lang.universalAst");
+const nativeImport = importNativeSource({ language: "python", sourcePath: "todo.py" });
+assert.equal(nativeImport.nativeSource.language, "python");
+assert.equal(nativeImport.universalAst.kind, "frontier.lang.universalAst");

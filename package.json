@@ -1,6 +1,6 @@
 {
   "name": "@shapeshift-labs/frontier-lang",
-  "version": "0.4.7",
+  "version": "0.4.8",
   "description": "Umbrella package for Frontier Lang kernel, parser, checker, compiler, and projection packages.",
   "type": "module",
   "main": "./dist/index.js",
@@ -58,7 +58,7 @@
   "dependencies": {
     "@shapeshift-labs/frontier-lang-c": "0.2.3",
     "@shapeshift-labs/frontier-lang-checker": "0.3.3",
-    "@shapeshift-labs/frontier-lang-compiler": "0.2.7",
+    "@shapeshift-labs/frontier-lang-compiler": "0.2.8",
     "@shapeshift-labs/frontier-lang-javascript": "0.2.3",
     "@shapeshift-labs/frontier-lang-kernel": "0.3.3",
     "@shapeshift-labs/frontier-lang-parser": "0.3.3",

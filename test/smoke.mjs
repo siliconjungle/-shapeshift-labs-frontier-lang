@@ -3,8 +3,10 @@ import {
   applySemanticPatch,
   checkDocument,
   classifyMerge,
+  ClangLanguagePackage,
   compileNativeSource,
   compileFrontierSource,
+  CSharpLanguagePackage,
   createUniversalCapabilityMatrix,
   createUniversalAstFromDocument,
   createPatch,
@@ -15,10 +17,14 @@ import {
   emitTypeScript,
   hashDocumentBase,
   importNativeSource,
+  GoLanguagePackage,
+  JavaLanguagePackage,
+  KotlinLanguagePackage,
   parseFrontierSource,
   projectFrontierAst,
   readUniversalAstJson,
   renderTargetAst,
+  SwiftLanguagePackage,
   toTypeScriptAst,
   writeUniversalAstJson
 } from "../dist/index.js";
@@ -137,3 +143,15 @@ const universalCapabilityMatrix = createUniversalCapabilityMatrix({
 });
 assert.equal(universalCapabilityMatrix.kind, "frontier.lang.universalCapabilityMatrix");
 assert.equal(universalCapabilityMatrix.summary.imports, 1);
+
+for (const languagePackage of [
+  ClangLanguagePackage,
+  CSharpLanguagePackage,
+  GoLanguagePackage,
+  JavaLanguagePackage,
+  KotlinLanguagePackage,
+  SwiftLanguagePackage
+]) {
+  assert.equal(languagePackage.version, "0.1.3");
+  assert.equal(languagePackage.compilerVersion, "0.2.42");
+}

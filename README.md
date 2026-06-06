@@ -210,6 +210,15 @@ The root package re-exports the browser-safe runtime packages:
 - `@shapeshift-labs/frontier-lang-c`: C header projection adapter.
 - `@shapeshift-labs/frontier-lang-compiler`: compiler facade for parse, check, and emit.
 
+The root import also exposes kernel semantic-operation records and compiler conversion artifacts for swarm merge admission:
+
+```js
+import { createSemanticOperationSet, createUniversalConversionArtifacts } from "@shapeshift-labs/frontier-lang";
+
+console.log(createSemanticOperationSet({ operations: [{ operationKind: "projection" }] }).summary.operations);
+console.log(createUniversalConversionArtifacts({ imports: [], targets: ["javascript"] }).summary.routes);
+```
+
 The Node CLI is intentionally separate:
 
 ```sh
@@ -299,4 +308,3 @@ npm run bench
 ```
 
 These are Frontier-only package measurements for @shapeshift-labs/frontier-lang. They exercise the package's own parser, checker, compiler, projection, CLI, fuzz, or semantic-kernel surface without making competitor comparison claims.
-

@@ -6,7 +6,9 @@ import {
   ClangLanguagePackage,
   compileNativeSource,
   compileFrontierSource,
+  createSemanticOperationSet,
   CSharpLanguagePackage,
+  createUniversalConversionArtifacts,
   createUniversalCapabilityMatrix,
   createUniversalAstFromDocument,
   createPatch,
@@ -143,6 +145,14 @@ const universalCapabilityMatrix = createUniversalCapabilityMatrix({
 });
 assert.equal(universalCapabilityMatrix.kind, "frontier.lang.universalCapabilityMatrix");
 assert.equal(universalCapabilityMatrix.summary.imports, 1);
+const operationSet = createSemanticOperationSet({
+  operations: [{ id: "op_root_projection", operationKind: "projection", readiness: "needs-review" }]
+});
+assert.equal(operationSet.summary.byOperationKind.projection, 1);
+assert.equal(operationSet.operations[0].autoMergeClaim, false);
+const conversionArtifacts = createUniversalConversionArtifacts({ imports: [nativeImport], targets: ["python"] });
+assert.equal(conversionArtifacts.kind, "frontier.lang.universalConversionArtifacts");
+assert.equal(conversionArtifacts.summary.semanticOperations, conversionArtifacts.summary.routes);
 
 for (const languagePackage of [
   ClangLanguagePackage,

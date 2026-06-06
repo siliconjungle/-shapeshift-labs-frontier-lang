@@ -5,6 +5,7 @@ import {
   classifyMerge,
   compileNativeSource,
   compileFrontierSource,
+  createUniversalCapabilityMatrix,
   createUniversalAstFromDocument,
   createPatch,
   emitCHeader,
@@ -129,3 +130,10 @@ const nativeCompile = compileNativeSource({
 assert.equal(nativeCompile.kind, "frontier.lang.nativeSourceCompileResult");
 assert.equal(nativeCompile.outputMode, "preserved-source");
 assert.match(nativeCompile.output, /export function step/);
+const universalCapabilityMatrix = createUniversalCapabilityMatrix({
+  imports: [nativeImport],
+  targets: ["python", "rust"],
+  requiredFeatures: ["syntax", "semantic", "sourcePreservation"]
+});
+assert.equal(universalCapabilityMatrix.kind, "frontier.lang.universalCapabilityMatrix");
+assert.equal(universalCapabilityMatrix.summary.imports, 1);

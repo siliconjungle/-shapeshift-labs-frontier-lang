@@ -153,6 +153,9 @@ assert.equal(operationSet.operations[0].autoMergeClaim, false);
 const conversionArtifacts = createUniversalConversionArtifacts({ imports: [nativeImport], targets: ["python"] });
 assert.equal(conversionArtifacts.kind, "frontier.lang.universalConversionArtifacts");
 assert.equal(conversionArtifacts.summary.semanticOperations, conversionArtifacts.summary.routes);
+assert.equal(conversionArtifacts.summary.admissionRecords, conversionArtifacts.summary.routes);
+assert.equal(conversionArtifacts.admissionRecords[0].kind, "frontier.lang.universalConversionAdmissionRecord");
+assert.equal(conversionArtifacts.admissionRecords[0].autoMergeClaim, false);
 
 for (const languagePackage of [
   ClangLanguagePackage,

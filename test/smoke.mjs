@@ -7,6 +7,7 @@ import {
   compileNativeSource,
   compileFrontierSource,
   createSemanticOperationSet,
+  createSemanticImportSidecar,
   CSharpLanguagePackage,
   createUniversalConversionArtifacts,
   createUniversalCapabilityMatrix,
@@ -137,7 +138,11 @@ const nativeCompile = compileNativeSource({
 });
 assert.equal(nativeCompile.kind, "frontier.lang.nativeSourceCompileResult");
 assert.equal(nativeCompile.outputMode, "preserved-source");
+assert.equal(nativeCompile.metadata.projectionReview.status, "preserved-source");
 assert.match(nativeCompile.output, /export function step/);
+const nativeSidecar = createSemanticImportSidecar(nativeCompile.importResult);
+assert.equal(nativeSidecar.semanticImpact.summary.weakMergeSignals >= 1, true);
+assert.equal(nativeSidecar.semanticImpact.records.every((record) => record.mergeSignal), true);
 const universalCapabilityMatrix = createUniversalCapabilityMatrix({
   imports: [nativeImport],
   targets: ["python", "rust"],
@@ -165,6 +170,6 @@ for (const languagePackage of [
   KotlinLanguagePackage,
   SwiftLanguagePackage
 ]) {
-  assert.equal(languagePackage.version, "0.1.10");
-  assert.equal(languagePackage.compilerVersion, "0.2.68");
+  assert.equal(languagePackage.version, "0.1.12");
+  assert.equal(languagePackage.compilerVersion, "0.2.70");
 }

@@ -165,6 +165,6 @@ for (const languagePackage of [
   KotlinLanguagePackage,
   SwiftLanguagePackage
 ]) {
-  assert.equal(languagePackage.version, "0.1.7");
-  assert.equal(languagePackage.compilerVersion, "0.2.64");
+  assert.equal(languagePackage.version, "0.1.10");
+  assert.equal(languagePackage.compilerVersion, "0.2.68");
 }

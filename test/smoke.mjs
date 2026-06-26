@@ -31,6 +31,7 @@ import {
   renderTargetAst,
   safeMergeCssSource,
   safeMergeHtmlSource,
+  safeMergeJsTsProject,
   SwiftLanguagePackage,
   toTypeScriptAst,
   writeUniversalAstJson
@@ -158,6 +159,27 @@ const cssModuleContractMerge = safeMergeCssSource({
 });
 assert.equal(cssModuleContractMerge.status, "merged");
 assert.equal(cssModuleContractMerge.workerChangedCssModuleContracts, 1);
+const cssModuleSpecifier = [".", "/", "Button.module.css"].join("");
+const cssModuleProjectMerge = safeMergeJsTsProject({
+  includeOutputProjectSymbolGraph: true,
+  files: [
+    {
+      language: "css",
+      sourcePath: "src/Button.module.css",
+      headSourceText: ".root { color: red; }\n.label { display: block; }\n"
+    },
+    {
+      language: "tsx",
+      sourcePath: "src/Button.tsx",
+      baseSourceText: `import styles from '${cssModuleSpecifier}';\nexport function Button() { return <button className={styles.root}>{styles.label}</button>; }\n`,
+      workerSourceText: `import styles from '${cssModuleSpecifier}';\nexport function Button() { return <button className={styles.root}>{styles.label}</button>; }\n`,
+      headSourceText: `import styles from '${cssModuleSpecifier}';\nexport function Button() { return <button className={styles.root}>{styles.label}</button>; }\n`
+    }
+  ]
+});
+const cssModuleBinding = cssModuleProjectMerge.outputProjectSymbolGraph.cssModuleImportBindings[0];
+assert.equal(cssModuleBinding.cssModuleEvidenceSource, "inferred-source");
+assert.deepEqual(cssModuleBinding.cssModuleExportNames, ["label", "root"]);
 assert.match(compileFrontierSource(source, { target: "javascript" }).output, /export const TodoSchema/);
 const universalAst = createUniversalAstFromDocument(document, { id: "uast_todo" });
 assert.equal(readUniversalAstJson(writeUniversalAstJson(universalAst)).kind, "frontier.lang.universalAst");

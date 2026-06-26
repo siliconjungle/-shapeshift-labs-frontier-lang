@@ -156,6 +156,14 @@ assert.equal(safeMergeCssSource({
   workerSourceText: ".button {\n  color: blue;\n  padding: 1rem;\n}\n",
   headSourceText: ".button {\n  color: red;\n  padding: 1rem;\n  background: white;\n}\n"
 }).status, "merged");
+const scopedCssMerge = safeMergeCssSource({
+  baseSourceText: "@media (min-width: 700px) {\n  .button { color: red; padding-left: 1rem; }\n}\n",
+  workerSourceText: "@media (min-width: 700px) {\n  .button { color: blue; padding-left: 1rem; }\n}\n",
+  headSourceText: "@media (min-width: 700px) {\n  .button { color: red; padding-left: 1rem; background-color: white; }\n}\n",
+  scopedCascadeGraphHash: "hash_scoped_cascade"
+});
+assert.equal(scopedCssMerge.status, "merged");
+assert.match(scopedCssMerge.mergedSourceText, /@media \(min-width: 700px\)/);
 const cssModuleContractMerge = safeMergeCssSource({
   sourcePath: "Button.module.css",
   baseSourceText: ".root {\n  color: red;\n}\n",

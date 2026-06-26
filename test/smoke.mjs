@@ -144,6 +144,13 @@ const htmlStructuralMerge = safeMergeHtmlSource({
 });
 assert.equal(htmlStructuralMerge.status, "merged");
 assert.match(htmlStructuralMerge.mergedSourceText, /data-frontier-key="save"/);
+const htmlReorderMerge = safeMergeHtmlSource({
+  baseSourceText: "<ul id=\"todos\">\n  <li data-frontier-key=\"a\">A</li>\n  <li data-frontier-key=\"b\">B</li>\n</ul>\n",
+  workerSourceText: "<ul id=\"todos\">\n  <li data-frontier-key=\"b\">B</li>\n  <li data-frontier-key=\"a\">A</li>\n</ul>\n",
+  headSourceText: "<ul id=\"todos\" class=\"list\">\n  <li data-frontier-key=\"a\">A</li>\n  <li data-frontier-key=\"b\">Bee</li>\n</ul>\n"
+});
+assert.equal(htmlReorderMerge.status, "merged");
+assert.match(htmlReorderMerge.mergedSourceText, /data-frontier-key="b">Bee<\/li>\n  <li data-frontier-key="a">A<\/li>/);
 assert.equal(safeMergeCssSource({
   baseSourceText: ".button {\n  color: red;\n  padding: 1rem;\n}\n",
   workerSourceText: ".button {\n  color: blue;\n  padding: 1rem;\n}\n",

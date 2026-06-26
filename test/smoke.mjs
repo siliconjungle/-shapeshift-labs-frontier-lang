@@ -139,7 +139,7 @@ assert.equal(safeMergeHtmlSource({
 assert.equal(safeMergeCssSource({
   baseSourceText: ".button {\n  color: red;\n  padding: 1rem;\n}\n",
   workerSourceText: ".button {\n  color: blue;\n  padding: 1rem;\n}\n",
-  headSourceText: ".button {\n  color: red;\n  padding: 1rem;\n  background-color: white;\n}\n"
+  headSourceText: ".button {\n  color: red;\n  padding: 1rem;\n  background: white;\n}\n"
 }).status, "merged");
 assert.match(compileFrontierSource(source, { target: "javascript" }).output, /export const TodoSchema/);
 const universalAst = createUniversalAstFromDocument(document, { id: "uast_todo" });

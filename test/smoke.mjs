@@ -164,6 +164,20 @@ const scopedCssMerge = safeMergeCssSource({
 });
 assert.equal(scopedCssMerge.status, "merged");
 assert.match(scopedCssMerge.mergedSourceText, /@media \(min-width: 700px\)/);
+const layerStatementMerge = safeMergeCssSource({
+  baseSourceText: "@layer reset, components;\n.button { color: red; }\n",
+  workerSourceText: "@layer reset, components;\n.button { color: blue; }\n",
+  headSourceText: "@layer reset, components;\n.button { color: red; background-color: white; }\n"
+});
+assert.equal(layerStatementMerge.status, "merged");
+assert.match(layerStatementMerge.mergedSourceText, /@layer reset, components;/);
+const oneSidedScopeConflict = safeMergeCssSource({
+  baseSourceText: ".button { color: red; }\n",
+  workerSourceText: "@media (min-width: 700px) { .button { color: red; } }\n",
+  headSourceText: ".button { color: blue; }\n",
+  scopedCascadeGraphHash: "hash_scoped_cascade"
+});
+assert.equal(oneSidedScopeConflict.conflicts.some((conflict) => conflict.details.reasonCode === "css-atrule-new-scope-unsupported"), true);
 const cssModuleContractMerge = safeMergeCssSource({
   sourcePath: "Button.module.css",
   baseSourceText: ".root {\n  color: red;\n}\n",

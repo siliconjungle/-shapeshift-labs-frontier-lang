@@ -14,6 +14,8 @@ import {
   createUniversalAstFromDocument,
   createPatch,
   emitCHeader,
+  emitCss,
+  emitHtml,
   emitJavaScript,
   emitPython,
   emitRust,
@@ -27,6 +29,8 @@ import {
   projectFrontierAst,
   readUniversalAstJson,
   renderTargetAst,
+  safeMergeCssSource,
+  safeMergeHtmlSource,
   SwiftLanguagePackage,
   toTypeScriptAst,
   writeUniversalAstJson
@@ -125,6 +129,18 @@ assert.match(emitJavaScript(document), /export const TodoSchema/);
 assert.match(emitRust(document), /pub struct Todo/);
 assert.match(emitPython(document), /class Todo/);
 assert.match(emitCHeader(document), /typedef struct Todo/);
+assert.match(emitHtml(document), /data-frontier-kind="entity"/);
+assert.match(emitCss(document), /\.frontier-Todo/);
+assert.equal(safeMergeHtmlSource({
+  baseSourceText: "<h1>Todo</h1>\n<button data-frontier-key=\"save\">Save</button>\n",
+  workerSourceText: "<h1>Todos</h1>\n<button data-frontier-key=\"save\">Save</button>\n",
+  headSourceText: "<h1>Todo</h1>\n<button data-frontier-key=\"save\" disabled>Save</button>\n"
+}).status, "merged");
+assert.equal(safeMergeCssSource({
+  baseSourceText: ".button {\n  color: red;\n  padding: 1rem;\n}\n",
+  workerSourceText: ".button {\n  color: blue;\n  padding: 1rem;\n}\n",
+  headSourceText: ".button {\n  color: red;\n  padding: 1rem;\n  background-color: white;\n}\n"
+}).status, "merged");
 assert.match(compileFrontierSource(source, { target: "javascript" }).output, /export const TodoSchema/);
 const universalAst = createUniversalAstFromDocument(document, { id: "uast_todo" });
 assert.equal(readUniversalAstJson(writeUniversalAstJson(universalAst)).kind, "frontier.lang.universalAst");

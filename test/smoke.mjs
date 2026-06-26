@@ -148,6 +148,16 @@ assert.equal(safeMergeCssSource({
   workerSourceText: ".button {\n  color: blue;\n  padding: 1rem;\n}\n",
   headSourceText: ".button {\n  color: red;\n  padding: 1rem;\n  background: white;\n}\n"
 }).status, "merged");
+const cssModuleContractMerge = safeMergeCssSource({
+  sourcePath: "Button.module.css",
+  baseSourceText: ".root {\n  color: red;\n}\n",
+  workerSourceText: ".root {\n  color: red;\n}\n.label {\n  font-weight: 600;\n}\n",
+  headSourceText: ".root {\n  color: blue;\n}\n",
+  generatedClassNameMap: { root: "Button_root__hash", label: "Button_label__hash" },
+  jsTsUseSiteGraphHash: "hash_css_module_use_sites"
+});
+assert.equal(cssModuleContractMerge.status, "merged");
+assert.equal(cssModuleContractMerge.workerChangedCssModuleContracts, 1);
 assert.match(compileFrontierSource(source, { target: "javascript" }).output, /export const TodoSchema/);
 const universalAst = createUniversalAstFromDocument(document, { id: "uast_todo" });
 assert.equal(readUniversalAstJson(writeUniversalAstJson(universalAst)).kind, "frontier.lang.universalAst");

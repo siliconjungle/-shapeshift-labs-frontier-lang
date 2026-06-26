@@ -136,6 +136,13 @@ assert.equal(safeMergeHtmlSource({
   workerSourceText: "<h1>Todos</h1>\n<button data-frontier-key=\"save\">Save</button>\n",
   headSourceText: "<h1>Todo</h1>\n<button data-frontier-key=\"save\" disabled>Save</button>\n"
 }).status, "merged");
+const htmlStructuralMerge = safeMergeHtmlSource({
+  baseSourceText: "<main id=\"app\">\n  <h1>Todo</h1>\n</main>\n",
+  workerSourceText: "<main id=\"app\">\n  <h1>Todo</h1>\n  <button data-frontier-key=\"save\">Save</button>\n</main>\n",
+  headSourceText: "<main id=\"app\" data-view=\"compact\">\n  <h1>Todo</h1>\n</main>\n"
+});
+assert.equal(htmlStructuralMerge.status, "merged");
+assert.match(htmlStructuralMerge.mergedSourceText, /data-frontier-key="save"/);
 assert.equal(safeMergeCssSource({
   baseSourceText: ".button {\n  color: red;\n  padding: 1rem;\n}\n",
   workerSourceText: ".button {\n  color: blue;\n  padding: 1rem;\n}\n",

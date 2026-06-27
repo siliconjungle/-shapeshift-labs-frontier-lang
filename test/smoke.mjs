@@ -220,6 +220,7 @@ assert.equal(safeMergeCssSource({
   workerSourceText: ".button {\n  color: blue;\n  padding: 1rem;\n}\n",
   headSourceText: ".button {\n  color: red;\n  padding: 1rem;\n  background: white;\n}\n"
 }).status, "merged");
+assert.equal(safeMergeCssSource({ baseSourceText: ".button { border-top: 1px solid red; }\n", workerSourceText: ".button { border-top: 2px solid red; }\n", headSourceText: ".button { border-top: 1px solid red; border-top-color: blue; }\n" }).status, "blocked");
 const scopedCssMerge = safeMergeCssSource({
   baseSourceText: "@media (min-width: 700px) {\n  .button { color: red; padding-left: 1rem; }\n}\n",
   workerSourceText: "@media (min-width: 700px) {\n  .button { color: blue; padding-left: 1rem; }\n}\n",

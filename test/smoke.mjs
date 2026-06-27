@@ -39,6 +39,8 @@ import {
 } from "../dist/index.js";
 import "./css-modules-contract-smoke.mjs";
 
+function htmlRuntimeEvidence(runtimeSignal, label) { return { runtimeCommand: `node test/html-runtime/${label}.mjs`, runtimeProbeId: `html:${runtimeSignal}:${label}`, runtimeEvidenceHash: hashSemanticValue(`html-runtime-evidence:${runtimeSignal}:${label}`), runtimeSignals: [runtimeSignal] }; }
+
 const source = `
 module TodoApp @id("mod_todo")
 
@@ -172,11 +174,11 @@ const htmlRuntimeMerge = safeMergeHtmlSource({
     baseSourceText: htmlRuntimeBase,
     workerSourceText: htmlRuntimeWorker,
     headSourceText: htmlRuntimeHead,
-    outputSourceText: htmlRuntimeOutput
+    outputSourceText: htmlRuntimeOutput,
+    ...htmlRuntimeEvidence("html-script-runtime", "script")
   }]
 });
-assert.equal(htmlRuntimeMerge.status, "merged");
-assert.equal(htmlRuntimeMerge.browserRuntimeEquivalenceClaim, true);
+assert.equal(htmlRuntimeMerge.status, "merged"); assert.equal(htmlRuntimeMerge.browserRuntimeEquivalenceClaim, true);
 const htmlEventRuntimeBase = "<button data-frontier-key=\"save\" onclick=\"save()\">Save</button>\n";
 const htmlEventRuntimeWorker = "<button data-frontier-key=\"save\" onclick=\"saveAndClose()\">Save</button>\n";
 const htmlEventRuntimeHead = "<button data-frontier-key=\"save\" onclick=\"save()\" aria-label=\"Save item\">Save</button>\n";
@@ -204,19 +206,18 @@ const htmlEventRuntimeMerge = safeMergeHtmlSource({
     baseSourceText: htmlEventRuntimeBase,
     workerSourceText: htmlEventRuntimeWorker,
     headSourceText: htmlEventRuntimeHead,
-    outputSourceText: htmlEventRuntimeOutput
+    outputSourceText: htmlEventRuntimeOutput,
+    ...htmlRuntimeEvidence("html-event-handler-runtime", "event-handler")
   }]
 });
-assert.equal(htmlEventRuntimeMerge.status, "merged");
-assert.equal(htmlEventRuntimeMerge.browserRuntimeEquivalenceClaim, true);
+assert.equal(htmlEventRuntimeMerge.status, "merged"); assert.equal(htmlEventRuntimeMerge.browserRuntimeEquivalenceClaim, true);
 const htmlRuntimeProjectProofs = [
-  { kind: "html-source-bound-runtime-boundary-proof", status: "passed", sourcePath: "src/view.html", reasonCode: "event-handler-runtime-boundary", side: "worker", boundary: "html-event-handler-attribute", boundaryAttributes: ["onclick"], sourceTexts: { base: htmlEventRuntimeBase, worker: htmlEventRuntimeWorker, head: htmlEventRuntimeBase, output: htmlEventRuntimeWorker } },
-  { kind: "html-source-bound-runtime-boundary-proof", status: "passed", sourcePath: "src/card.html", reasonCode: "inline-style-runtime-boundary", side: "worker", boundary: "html-inline-style-attribute", boundaryAttributes: ["style"], sourceTexts: { base: "<div data-frontier-key=\"card\" style=\"color: red\">Card</div>\n", worker: "<div data-frontier-key=\"card\" style=\"color: blue\">Card</div>\n", head: "<div data-frontier-key=\"card\" class=\"panel\" style=\"color: red\">Card</div>\n", output: "<div class=\"panel\" data-frontier-key=\"card\" style=\"color: blue\">Card</div>\n" } },
-  { kind: "html-source-bound-runtime-boundary-proof", status: "passed", sourcePath: "src/frame.html", reasonCode: "iframe-runtime-boundary", side: "worker", boundary: "html-iframe-runtime-attribute", boundaryAttributes: ["src"], sourceTexts: { base: "<iframe data-frontier-key=\"preview\" src=\"/a.html\" title=\"Preview\"></iframe>\n", worker: "<iframe data-frontier-key=\"preview\" src=\"/b.html\" title=\"Preview\"></iframe>\n", head: "<iframe class=\"embed\" data-frontier-key=\"preview\" src=\"/a.html\" title=\"Preview\"></iframe>\n", output: "<iframe class=\"embed\" data-frontier-key=\"preview\" src=\"/b.html\" title=\"Preview\"></iframe>\n" } }
+  { kind: "html-source-bound-runtime-boundary-proof", status: "passed", sourcePath: "src/view.html", reasonCode: "event-handler-runtime-boundary", side: "worker", boundary: "html-event-handler-attribute", boundaryAttributes: ["onclick"], sourceTexts: { base: htmlEventRuntimeBase, worker: htmlEventRuntimeWorker, head: htmlEventRuntimeBase, output: htmlEventRuntimeWorker }, ...htmlRuntimeEvidence("html-event-handler-runtime", "event-handler-project") },
+  { kind: "html-source-bound-runtime-boundary-proof", status: "passed", sourcePath: "src/card.html", reasonCode: "inline-style-runtime-boundary", side: "worker", boundary: "html-inline-style-attribute", boundaryAttributes: ["style"], sourceTexts: { base: "<div data-frontier-key=\"card\" style=\"color: red\">Card</div>\n", worker: "<div data-frontier-key=\"card\" style=\"color: blue\">Card</div>\n", head: "<div data-frontier-key=\"card\" class=\"panel\" style=\"color: red\">Card</div>\n", output: "<div class=\"panel\" data-frontier-key=\"card\" style=\"color: blue\">Card</div>\n" }, ...htmlRuntimeEvidence("html-inline-style-runtime", "inline-style-project") },
+  { kind: "html-source-bound-runtime-boundary-proof", status: "passed", sourcePath: "src/frame.html", reasonCode: "iframe-runtime-boundary", side: "worker", boundary: "html-iframe-runtime-attribute", boundaryAttributes: ["src"], sourceTexts: { base: "<iframe data-frontier-key=\"preview\" src=\"/a.html\" title=\"Preview\"></iframe>\n", worker: "<iframe data-frontier-key=\"preview\" src=\"/b.html\" title=\"Preview\"></iframe>\n", head: "<iframe class=\"embed\" data-frontier-key=\"preview\" src=\"/a.html\" title=\"Preview\"></iframe>\n", output: "<iframe class=\"embed\" data-frontier-key=\"preview\" src=\"/b.html\" title=\"Preview\"></iframe>\n" }, ...htmlRuntimeEvidence("html-iframe-runtime", "iframe-project") }
 ];
 const htmlRuntimeProjectMerge = safeMergeJsTsProject({ id: "html_runtime_project_merge_facade", htmlRuntimeBoundaryProofsByPath: Object.fromEntries(htmlRuntimeProjectProofs.map((proof) => [proof.sourcePath, [proof]])), files: htmlRuntimeProjectProofs.map(({ sourcePath, sourceTexts }) => ({ sourcePath, baseSourceText: sourceTexts.base, workerSourceText: sourceTexts.worker, headSourceText: sourceTexts.head })) });
-assert.equal(htmlRuntimeProjectMerge.status, "merged");
-assert.equal(htmlRuntimeProjectMerge.summary.htmlCssBrowserRuntimeProofs, 3);
+assert.equal(htmlRuntimeProjectMerge.status, "merged"); assert.equal(htmlRuntimeProjectMerge.summary.htmlCssBrowserRuntimeProofs, 3);
 assert.equal(safeMergeCssSource({
   baseSourceText: ".button {\n  color: red;\n  padding: 1rem;\n}\n",
   workerSourceText: ".button {\n  color: blue;\n  padding: 1rem;\n}\n",

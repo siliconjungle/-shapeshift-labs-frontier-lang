@@ -175,6 +175,38 @@ const htmlRuntimeMerge = safeMergeHtmlSource({
 });
 assert.equal(htmlRuntimeMerge.status, "merged");
 assert.equal(htmlRuntimeMerge.browserRuntimeEquivalenceClaim, true);
+const htmlEventRuntimeBase = "<button data-frontier-key=\"save\" onclick=\"save()\">Save</button>\n";
+const htmlEventRuntimeWorker = "<button data-frontier-key=\"save\" onclick=\"saveAndClose()\">Save</button>\n";
+const htmlEventRuntimeHead = "<button data-frontier-key=\"save\" onclick=\"save()\" aria-label=\"Save item\">Save</button>\n";
+const htmlEventRuntimeOutput = "<button aria-label=\"Save item\" data-frontier-key=\"save\" onclick=\"saveAndClose()\">Save</button>\n";
+const htmlEventRuntimeBlocked = safeMergeHtmlSource({
+  sourcePath: "view.html",
+  baseSourceText: htmlEventRuntimeBase,
+  workerSourceText: htmlEventRuntimeWorker,
+  headSourceText: htmlEventRuntimeHead
+});
+assert.equal(htmlEventRuntimeBlocked.conflicts.some((conflict) => conflict.details.reasonCode === "event-handler-runtime-boundary"), true);
+const htmlEventRuntimeMerge = safeMergeHtmlSource({
+  sourcePath: "view.html",
+  baseSourceText: htmlEventRuntimeBase,
+  workerSourceText: htmlEventRuntimeWorker,
+  headSourceText: htmlEventRuntimeHead,
+  htmlRuntimeBoundaryProofs: [{
+    kind: "html-source-bound-runtime-boundary-proof",
+    status: "passed",
+    sourcePath: "view.html",
+    reasonCode: "event-handler-runtime-boundary",
+    side: "worker",
+    boundary: "html-event-handler-attribute",
+    boundaryAttributes: ["onclick"],
+    baseSourceText: htmlEventRuntimeBase,
+    workerSourceText: htmlEventRuntimeWorker,
+    headSourceText: htmlEventRuntimeHead,
+    outputSourceText: htmlEventRuntimeOutput
+  }]
+});
+assert.equal(htmlEventRuntimeMerge.status, "merged");
+assert.equal(htmlEventRuntimeMerge.browserRuntimeEquivalenceClaim, true);
 assert.equal(safeMergeCssSource({
   baseSourceText: ".button {\n  color: red;\n  padding: 1rem;\n}\n",
   workerSourceText: ".button {\n  color: blue;\n  padding: 1rem;\n}\n",

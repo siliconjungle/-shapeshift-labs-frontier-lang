@@ -21,6 +21,7 @@ import {
   emitRust,
   emitTypeScript,
   hashDocumentBase,
+  hashSemanticValue,
   importNativeSource,
   GoLanguagePackage,
   JavaLanguagePackage,
@@ -222,11 +223,16 @@ assert.equal(safeMergeCssSource({
   headSourceText: ".button {\n  color: red;\n  padding: 1rem;\n  background-color: white;\n}\n"
 }).status, "merged");
 assert.equal(safeMergeCssSource({ baseSourceText: ".button { border-top: 1px solid red; }\n", workerSourceText: ".button { border-top: 2px solid red; }\n", headSourceText: ".button { border-top: 1px solid red; border-top-color: blue; }\n" }).status, "blocked");
+const scopedCssBase = "@media (min-width: 700px) {\n  .button { color: red; padding-left: 1rem; }\n}\n";
+const scopedCssWorker = "@media (min-width: 700px) {\n  .button { color: blue; padding-left: 1rem; }\n}\n";
+const scopedCssHead = "@media (min-width: 700px) {\n  .button { color: red; padding-left: 1rem; background-color: white; }\n}\n";
+const scopedCssOutput = "@media (min-width: 700px) {\n  .button {\n    color: blue;\n    padding-left: 1rem;\n    background-color: white;\n  }\n}\n";
 const scopedCssMerge = safeMergeCssSource({
-  baseSourceText: "@media (min-width: 700px) {\n  .button { color: red; padding-left: 1rem; }\n}\n",
-  workerSourceText: "@media (min-width: 700px) {\n  .button { color: blue; padding-left: 1rem; }\n}\n",
-  headSourceText: "@media (min-width: 700px) {\n  .button { color: red; padding-left: 1rem; background-color: white; }\n}\n",
-  scopedCascadeGraphHash: "hash_scoped_cascade"
+  baseSourceText: scopedCssBase,
+  workerSourceText: scopedCssWorker,
+  headSourceText: scopedCssHead,
+  scopedCascadeGraphHash: "hash_scoped_cascade",
+  cssScopedCascadeProofs: [{ id: "proof_scoped_css_umbrella", kind: "css-source-bound-scoped-cascade-proof", status: "passed", reasonCode: "css-scoped-cascade-equivalence-unproved", sides: ["worker", "head"], selectors: [".button"], scopes: ["@media (min-width: 700px)"], cascadeKeys: ["@media (min-width: 700px)::.button::color", "@media (min-width: 700px)::.button::background-color"], properties: ["color", "background-color"], scopedCascadeGraphHash: "hash_scoped_cascade", baseSourceHash: hashSemanticValue(scopedCssBase), workerSourceHash: hashSemanticValue(scopedCssWorker), headSourceHash: hashSemanticValue(scopedCssHead), outputSourceHash: hashSemanticValue(scopedCssOutput) }]
 });
 assert.equal(scopedCssMerge.status, "merged");
 assert.match(scopedCssMerge.mergedSourceText, /@media \(min-width: 700px\)/);

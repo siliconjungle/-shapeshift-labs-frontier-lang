@@ -207,6 +207,10 @@ const htmlEventRuntimeMerge = safeMergeHtmlSource({
 });
 assert.equal(htmlEventRuntimeMerge.status, "merged");
 assert.equal(htmlEventRuntimeMerge.browserRuntimeEquivalenceClaim, true);
+const htmlEventProjectProof = { kind: "html-source-bound-runtime-boundary-proof", status: "passed", sourcePath: "src/view.html", reasonCode: "event-handler-runtime-boundary", side: "worker", boundary: "html-event-handler-attribute", boundaryAttributes: ["onclick"], sourceTexts: { base: htmlEventRuntimeBase, worker: htmlEventRuntimeWorker, head: htmlEventRuntimeBase, output: htmlEventRuntimeWorker } };
+const htmlEventProjectMerge = safeMergeJsTsProject({ id: "html_event_project_merge_facade", htmlRuntimeBoundaryProofsByPath: { "src/view.html": [htmlEventProjectProof] }, files: [{ sourcePath: "src/view.html", baseSourceText: htmlEventRuntimeBase, workerSourceText: htmlEventRuntimeWorker, headSourceText: htmlEventRuntimeBase }] });
+assert.equal(htmlEventProjectMerge.status, "merged");
+assert.equal(htmlEventProjectMerge.summary.htmlCssBrowserRuntimeProofs, 1);
 assert.equal(safeMergeCssSource({
   baseSourceText: ".button {\n  color: red;\n  padding: 1rem;\n}\n",
   workerSourceText: ".button {\n  color: blue;\n  padding: 1rem;\n}\n",

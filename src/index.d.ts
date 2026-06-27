@@ -14,6 +14,8 @@ export * from "@shapeshift-labs/frontier-lang-clang";
 
 export {
   type HtmlProjectionOptions,
+  type HtmlBrowserRuntimeProof,
+  type HtmlBrowserRuntimeProofRecord,
   type HtmlSemanticMergeEvidence,
   type HtmlSafeMergeResult,
   createHtmlSemanticMergeEvidence,

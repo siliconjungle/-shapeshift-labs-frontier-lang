@@ -151,6 +151,30 @@ const htmlReorderMerge = safeMergeHtmlSource({
 });
 assert.equal(htmlReorderMerge.status, "merged");
 assert.match(htmlReorderMerge.mergedSourceText, /data-frontier-key="b">Bee<\/li>\n  <li data-frontier-key="a">A<\/li>/);
+const htmlRuntimeBase = "<script>window.value = 1;</script>\n<h1>Todo</h1>\n";
+const htmlRuntimeWorker = "<script>window.value = 2;</script>\n<h1>Todo</h1>\n";
+const htmlRuntimeHead = "<script>window.value = 1;</script>\n<h1>Todos</h1>\n";
+const htmlRuntimeOutput = "<script>window.value = 2;</script>\n<h1>Todos</h1>\n";
+const htmlRuntimeMerge = safeMergeHtmlSource({
+  sourcePath: "view.html",
+  baseSourceText: htmlRuntimeBase,
+  workerSourceText: htmlRuntimeWorker,
+  headSourceText: htmlRuntimeHead,
+  htmlBrowserRuntimeProofs: [{
+    kind: "html-source-bound-browser-runtime-proof",
+    status: "passed",
+    sourcePath: "view.html",
+    reasonCode: "script-runtime-boundary",
+    side: "worker",
+    recordKey: "text#script[1]/#text[1]",
+    baseSourceText: htmlRuntimeBase,
+    workerSourceText: htmlRuntimeWorker,
+    headSourceText: htmlRuntimeHead,
+    outputSourceText: htmlRuntimeOutput
+  }]
+});
+assert.equal(htmlRuntimeMerge.status, "merged");
+assert.equal(htmlRuntimeMerge.browserRuntimeEquivalenceClaim, true);
 assert.equal(safeMergeCssSource({
   baseSourceText: ".button {\n  color: red;\n  padding: 1rem;\n}\n",
   workerSourceText: ".button {\n  color: blue;\n  padding: 1rem;\n}\n",

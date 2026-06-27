@@ -218,7 +218,7 @@ assert.equal(htmlRuntimeProjectMerge.summary.htmlCssBrowserRuntimeProofs, 3);
 assert.equal(safeMergeCssSource({
   baseSourceText: ".button {\n  color: red;\n  padding: 1rem;\n}\n",
   workerSourceText: ".button {\n  color: blue;\n  padding: 1rem;\n}\n",
-  headSourceText: ".button {\n  color: red;\n  padding: 1rem;\n  background: white;\n}\n"
+  headSourceText: ".button {\n  color: red;\n  padding: 1rem;\n  background-color: white;\n}\n"
 }).status, "merged");
 assert.equal(safeMergeCssSource({ baseSourceText: ".button { border-top: 1px solid red; }\n", workerSourceText: ".button { border-top: 2px solid red; }\n", headSourceText: ".button { border-top: 1px solid red; border-top-color: blue; }\n" }).status, "blocked");
 const scopedCssMerge = safeMergeCssSource({
@@ -310,7 +310,7 @@ assert.equal(conversionArtifacts.summary.semanticOperations, conversionArtifacts
 assert.equal(conversionArtifacts.summary.admissionRecords, conversionArtifacts.summary.routes);
 assert.equal(conversionArtifacts.admissionRecords[0].kind, "frontier.lang.universalConversionAdmissionRecord");
 assert.equal(conversionArtifacts.admissionRecords[0].autoMergeClaim, false);
-const cssAtRuleFacadeMerge = safeMergeJsTsProject({ id: "css_at_rule_facade", files: [{ sourcePath: "src/anim.css", baseSourceText: "@keyframes fade { from { opacity: 0; } to { opacity: 1; } }\n.button { color: red; }\n", workerSourceText: "@keyframes fade { from { opacity: 0; } to { opacity: 1; } }\n.button { color: blue; }\n", headSourceText: "@keyframes fade { from { opacity: 0; } to { opacity: 1; } }\n.button { color: red; background: white; }\n" }] });
+const cssAtRuleFacadeMerge = safeMergeJsTsProject({ id: "css_at_rule_facade", files: [{ sourcePath: "src/anim.css", baseSourceText: "@keyframes fade { from { opacity: 0; } to { opacity: 1; } }\n.button { color: red; }\n", workerSourceText: "@keyframes fade { from { opacity: 0; } to { opacity: 1; } }\n.button { color: blue; }\n", headSourceText: "@keyframes fade { from { opacity: 0; } to { opacity: 1; } }\n.button { color: red; background-color: white; }\n" }] });
 assert.equal(cssAtRuleFacadeMerge.status, "merged");
 assert.match(cssAtRuleFacadeMerge.outputFiles[0].sourceText, /@keyframes fade/);
 

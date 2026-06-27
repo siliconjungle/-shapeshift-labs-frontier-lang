@@ -36,6 +36,7 @@ import {
   toTypeScriptAst,
   writeUniversalAstJson
 } from "../dist/index.js";
+import "./css-modules-contract-smoke.mjs";
 
 const source = `
 module TodoApp @id("mod_todo")
@@ -243,16 +244,6 @@ const oneSidedScopeConflict = safeMergeCssSource({
   scopedCascadeGraphHash: "hash_scoped_cascade"
 });
 assert.equal(oneSidedScopeConflict.conflicts.some((conflict) => conflict.details.reasonCode === "css-atrule-new-scope-unsupported"), true);
-const cssModuleContractMerge = safeMergeCssSource({
-  sourcePath: "Button.module.css",
-  baseSourceText: ".root {\n  color: red;\n}\n",
-  workerSourceText: ".root {\n  color: red;\n}\n.label {\n  font-weight: 600;\n}\n",
-  headSourceText: ".root {\n  color: blue;\n}\n",
-  generatedClassNameMap: { root: "Button_root__hash", label: "Button_label__hash" },
-  jsTsUseSiteGraphHash: "hash_css_module_use_sites"
-});
-assert.equal(cssModuleContractMerge.status, "merged");
-assert.equal(cssModuleContractMerge.workerChangedCssModuleContracts, 1);
 const cssModuleSpecifier = [".", "/", "Button.module.css"].join("");
 const cssModuleProjectMerge = safeMergeJsTsProject({
   includeOutputProjectSymbolGraph: true,

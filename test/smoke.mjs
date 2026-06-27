@@ -207,10 +207,13 @@ const htmlEventRuntimeMerge = safeMergeHtmlSource({
 });
 assert.equal(htmlEventRuntimeMerge.status, "merged");
 assert.equal(htmlEventRuntimeMerge.browserRuntimeEquivalenceClaim, true);
-const htmlEventProjectProof = { kind: "html-source-bound-runtime-boundary-proof", status: "passed", sourcePath: "src/view.html", reasonCode: "event-handler-runtime-boundary", side: "worker", boundary: "html-event-handler-attribute", boundaryAttributes: ["onclick"], sourceTexts: { base: htmlEventRuntimeBase, worker: htmlEventRuntimeWorker, head: htmlEventRuntimeBase, output: htmlEventRuntimeWorker } };
-const htmlEventProjectMerge = safeMergeJsTsProject({ id: "html_event_project_merge_facade", htmlRuntimeBoundaryProofsByPath: { "src/view.html": [htmlEventProjectProof] }, files: [{ sourcePath: "src/view.html", baseSourceText: htmlEventRuntimeBase, workerSourceText: htmlEventRuntimeWorker, headSourceText: htmlEventRuntimeBase }] });
-assert.equal(htmlEventProjectMerge.status, "merged");
-assert.equal(htmlEventProjectMerge.summary.htmlCssBrowserRuntimeProofs, 1);
+const htmlRuntimeProjectProofs = [
+  { kind: "html-source-bound-runtime-boundary-proof", status: "passed", sourcePath: "src/view.html", reasonCode: "event-handler-runtime-boundary", side: "worker", boundary: "html-event-handler-attribute", boundaryAttributes: ["onclick"], sourceTexts: { base: htmlEventRuntimeBase, worker: htmlEventRuntimeWorker, head: htmlEventRuntimeBase, output: htmlEventRuntimeWorker } },
+  { kind: "html-source-bound-runtime-boundary-proof", status: "passed", sourcePath: "src/card.html", reasonCode: "inline-style-runtime-boundary", side: "worker", boundary: "html-inline-style-attribute", boundaryAttributes: ["style"], sourceTexts: { base: "<div data-frontier-key=\"card\" style=\"color: red\">Card</div>\n", worker: "<div data-frontier-key=\"card\" style=\"color: blue\">Card</div>\n", head: "<div data-frontier-key=\"card\" class=\"panel\" style=\"color: red\">Card</div>\n", output: "<div class=\"panel\" data-frontier-key=\"card\" style=\"color: blue\">Card</div>\n" } }
+];
+const htmlRuntimeProjectMerge = safeMergeJsTsProject({ id: "html_runtime_project_merge_facade", htmlRuntimeBoundaryProofsByPath: Object.fromEntries(htmlRuntimeProjectProofs.map((proof) => [proof.sourcePath, [proof]])), files: htmlRuntimeProjectProofs.map(({ sourcePath, sourceTexts }) => ({ sourcePath, baseSourceText: sourceTexts.base, workerSourceText: sourceTexts.worker, headSourceText: sourceTexts.head })) });
+assert.equal(htmlRuntimeProjectMerge.status, "merged");
+assert.equal(htmlRuntimeProjectMerge.summary.htmlCssBrowserRuntimeProofs, 2);
 assert.equal(safeMergeCssSource({
   baseSourceText: ".button {\n  color: red;\n  padding: 1rem;\n}\n",
   workerSourceText: ".button {\n  color: blue;\n  padding: 1rem;\n}\n",
@@ -306,14 +309,7 @@ assert.equal(conversionArtifacts.summary.admissionRecords, conversionArtifacts.s
 assert.equal(conversionArtifacts.admissionRecords[0].kind, "frontier.lang.universalConversionAdmissionRecord");
 assert.equal(conversionArtifacts.admissionRecords[0].autoMergeClaim, false);
 
-for (const languagePackage of [
-  ClangLanguagePackage,
-  CSharpLanguagePackage,
-  GoLanguagePackage,
-  JavaLanguagePackage,
-  KotlinLanguagePackage,
-  SwiftLanguagePackage
-]) {
+for (const languagePackage of [ClangLanguagePackage, CSharpLanguagePackage, GoLanguagePackage, JavaLanguagePackage, KotlinLanguagePackage, SwiftLanguagePackage]) {
   assert.equal(languagePackage.version, "0.1.13");
   assert.equal(languagePackage.compilerVersion, "0.2.71");
 }

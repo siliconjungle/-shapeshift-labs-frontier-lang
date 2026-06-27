@@ -227,15 +227,17 @@ const scopedCssBase = "@media (min-width: 700px) {\n  .button { color: red; padd
 const scopedCssWorker = "@media (min-width: 700px) {\n  .button { color: blue; padding-left: 1rem; }\n}\n";
 const scopedCssHead = "@media (min-width: 700px) {\n  .button { color: red; padding-left: 1rem; background-color: white; }\n}\n";
 const scopedCssOutput = "@media (min-width: 700px) {\n  .button {\n    color: blue;\n    padding-left: 1rem;\n    background-color: white;\n  }\n}\n";
+const scopedCssShapeKey = "@media (min-width: 700px)";
 const scopedCssMerge = safeMergeCssSource({
   baseSourceText: scopedCssBase,
   workerSourceText: scopedCssWorker,
   headSourceText: scopedCssHead,
-  scopedCascadeGraphHash: "hash_scoped_cascade",
-  cssScopedCascadeProofs: [{ id: "proof_scoped_css_umbrella", kind: "css-source-bound-scoped-cascade-proof", status: "passed", reasonCode: "css-scoped-cascade-equivalence-unproved", sides: ["worker", "head"], selectors: [".button"], scopes: ["@media (min-width: 700px)"], cascadeKeys: ["@media (min-width: 700px)::.button::color", "@media (min-width: 700px)::.button::background-color"], properties: ["color", "background-color"], scopedCascadeGraphHash: "hash_scoped_cascade", baseSourceHash: hashSemanticValue(scopedCssBase), workerSourceHash: hashSemanticValue(scopedCssWorker), headSourceHash: hashSemanticValue(scopedCssHead), outputSourceHash: hashSemanticValue(scopedCssOutput) }]
+  scopedCascadeGraphHashesByShapeKey: { [scopedCssShapeKey]: "hash_scoped_cascade" },
+  cssScopedCascadeProofs: [{ id: "proof_scoped_css_umbrella", kind: "css-source-bound-scoped-cascade-proof", status: "passed", reasonCode: "css-scoped-cascade-equivalence-unproved", sides: ["worker", "head"], selectors: [".button"], scopes: [scopedCssShapeKey], cascadeKeys: ["@media (min-width: 700px)::.button::color", "@media (min-width: 700px)::.button::background-color"], properties: ["color", "background-color"], scopedCascadeGraphHash: "hash_scoped_cascade", scopedCascadeGraphShapeKey: scopedCssShapeKey, scopedCascadeGraphHashesByShapeKey: { [scopedCssShapeKey]: "hash_scoped_cascade" }, baseSourceHash: hashSemanticValue(scopedCssBase), workerSourceHash: hashSemanticValue(scopedCssWorker), headSourceHash: hashSemanticValue(scopedCssHead), outputSourceHash: hashSemanticValue(scopedCssOutput) }]
 });
 assert.equal(scopedCssMerge.status, "merged");
 assert.match(scopedCssMerge.mergedSourceText, /@media \(min-width: 700px\)/);
+assert.equal(scopedCssMerge.scopedCascadeProofs.every((proof) => proof.scopedCascadeGraphShapeKey === scopedCssShapeKey), true);
 const layerStatementMerge = safeMergeCssSource({
   baseSourceText: "@layer reset, components;\n.button { color: red; }\n",
   workerSourceText: "@layer reset, components;\n.button { color: blue; }\n",

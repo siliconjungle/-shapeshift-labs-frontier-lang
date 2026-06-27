@@ -310,6 +310,9 @@ assert.equal(conversionArtifacts.summary.semanticOperations, conversionArtifacts
 assert.equal(conversionArtifacts.summary.admissionRecords, conversionArtifacts.summary.routes);
 assert.equal(conversionArtifacts.admissionRecords[0].kind, "frontier.lang.universalConversionAdmissionRecord");
 assert.equal(conversionArtifacts.admissionRecords[0].autoMergeClaim, false);
+const cssAtRuleFacadeMerge = safeMergeJsTsProject({ id: "css_at_rule_facade", files: [{ sourcePath: "src/anim.css", baseSourceText: "@keyframes fade { from { opacity: 0; } to { opacity: 1; } }\n.button { color: red; }\n", workerSourceText: "@keyframes fade { from { opacity: 0; } to { opacity: 1; } }\n.button { color: blue; }\n", headSourceText: "@keyframes fade { from { opacity: 0; } to { opacity: 1; } }\n.button { color: red; background: white; }\n" }] });
+assert.equal(cssAtRuleFacadeMerge.status, "merged");
+assert.match(cssAtRuleFacadeMerge.outputFiles[0].sourceText, /@keyframes fade/);
 
 for (const languagePackage of [ClangLanguagePackage, CSharpLanguagePackage, GoLanguagePackage, JavaLanguagePackage, KotlinLanguagePackage, SwiftLanguagePackage]) {
   assert.equal(languagePackage.version, "0.1.13");

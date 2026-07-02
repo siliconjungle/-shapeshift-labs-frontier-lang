@@ -4,6 +4,10 @@ export * from "@shapeshift-labs/frontier-lang-checker";
 export * from "@shapeshift-labs/frontier-lang-typescript";
 export * from "@shapeshift-labs/frontier-lang-dialects";
 export * from "@shapeshift-labs/frontier-lang-compiler";
+export * from "@shapeshift-labs/frontier-lang-jsx";
+export * from "@shapeshift-labs/frontier-lang-svg";
+export * from "@shapeshift-labs/frontier-lang-package";
+export * from "@shapeshift-labs/frontier-lang-assembly";
 export * from "@shapeshift-labs/frontier-lang-html";
 export * from "@shapeshift-labs/frontier-lang-css";
 export * from "@shapeshift-labs/frontier-lang-swift";
@@ -44,6 +48,10 @@ export {
 
 export * as frontierLangJavaScript from "@shapeshift-labs/frontier-lang-javascript";
 export * as frontierLangDialects from "@shapeshift-labs/frontier-lang-dialects";
+export * as frontierLangJsx from "@shapeshift-labs/frontier-lang-jsx";
+export * as frontierLangSvg from "@shapeshift-labs/frontier-lang-svg";
+export * as frontierLangPackage from "@shapeshift-labs/frontier-lang-package";
+export * as frontierLangAssembly from "@shapeshift-labs/frontier-lang-assembly";
 export * as frontierLangHtml from "@shapeshift-labs/frontier-lang-html";
 export * as frontierLangCss from "@shapeshift-labs/frontier-lang-css";
 export * as frontierLangRust from "@shapeshift-labs/frontier-lang-rust";

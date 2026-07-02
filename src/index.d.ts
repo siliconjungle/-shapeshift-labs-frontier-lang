@@ -14,6 +14,60 @@ export * from "@shapeshift-labs/frontier-lang-csharp";
 export * from "@shapeshift-labs/frontier-lang-clang";
 
 export {
+  type JsxProofGap,
+  type JsxPropRecord,
+  type JsxElementRecord,
+  type JsxSemanticTree,
+  type JsxSemanticMergeEvidence,
+  parseJsxSemanticTree,
+  createJsxSemanticMergeEvidence,
+  summarizeJsxSemanticTree,
+  queryJsxElementRecords
+} from "@shapeshift-labs/frontier-lang-jsx";
+export {
+  type SvgProofGap,
+  type SvgElementRecord,
+  type SvgDefinitionRecord,
+  type SvgReferenceRecord,
+  type SvgReferenceGraph,
+  type SvgSemanticTree,
+  type SvgSemanticMergeEvidence,
+  parseSvgSemanticTree,
+  createSvgSemanticMergeEvidence,
+  querySvgReferenceGraph,
+  summarizeSvgSemanticTree
+} from "@shapeshift-labs/frontier-lang-svg";
+export {
+  type PackageManifestRecordKind,
+  type PackageManifestProofGap,
+  type PackageManifestSemanticRecord,
+  type PackageManifestSemanticTree,
+  type PackageManifestSemanticMergeEvidence,
+  parsePackageManifestSemanticTree,
+  createPackageManifestSemanticMergeEvidence,
+  summarizePackageManifestSemanticTree,
+  queryPackageDependencyRecords
+} from "@shapeshift-labs/frontier-lang-package";
+export {
+  type AssemblyProofGap,
+  type AssemblyDialectProfile,
+  type AssemblyLabelRecord,
+  type AssemblyDirectiveRecord,
+  type AssemblyInstructionRecord,
+  type AssemblyCommentRecord,
+  type AssemblyRecord,
+  type AssemblyScanSummary,
+  type AssemblySemanticScan,
+  type AssemblySemanticMergeEvidence,
+  type AssemblySymbolQueryResult,
+  AssemblyDialectProfiles,
+  normalizeAssemblyDialect,
+  scanAssemblySource,
+  createAssemblySemanticMergeEvidence,
+  summarizeAssemblyScan,
+  queryAssemblySymbols
+} from "@shapeshift-labs/frontier-lang-assembly";
+export {
   type HtmlProjectionOptions,
   type HtmlBrowserRuntimeProof,
   type HtmlBrowserRuntimeProofRecord,
@@ -112,6 +166,10 @@ export {
 
 export * as frontierLangJavaScript from "@shapeshift-labs/frontier-lang-javascript";
 export * as frontierLangDialects from "@shapeshift-labs/frontier-lang-dialects";
+export * as frontierLangJsx from "@shapeshift-labs/frontier-lang-jsx";
+export * as frontierLangSvg from "@shapeshift-labs/frontier-lang-svg";
+export * as frontierLangPackage from "@shapeshift-labs/frontier-lang-package";
+export * as frontierLangAssembly from "@shapeshift-labs/frontier-lang-assembly";
 export * as frontierLangHtml from "@shapeshift-labs/frontier-lang-html";
 export * as frontierLangCss from "@shapeshift-labs/frontier-lang-css";
 export * as frontierLangRust from "@shapeshift-labs/frontier-lang-rust";

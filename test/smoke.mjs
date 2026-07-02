@@ -18,7 +18,7 @@ import {
   emitHtml,
   emitJavaScript,
   emitPython,
-  emitRust,
+  emitRust, emitSwiftUi,
   emitTypeScript,
   hashDocumentBase,
   hashSemanticValue,
@@ -33,7 +33,7 @@ import {
   safeMergeCssSource,
   safeMergeHtmlSource,
   safeMergeJsTsProject,
-  SwiftLanguagePackage,
+  SwiftLanguagePackage, SwiftUiLanguagePackage,
   toTypeScriptAst,
   writeUniversalAstJson
 } from "../dist/index.js";
@@ -132,7 +132,7 @@ assert.match(emitted, /export function addTodo/);
 assert.match(emitJavaScript(document), /export const TodoSchema/);
 assert.match(emitRust(document), /pub struct Todo/);
 assert.match(emitPython(document), /class Todo/);
-assert.match(emitCHeader(document), /typedef struct Todo/);
+assert.match(emitCHeader(document), /typedef struct Todo/); assert.match(emitSwiftUi(document), /import SwiftUI/);
 assert.match(emitHtml(document), /data-frontier-kind="entity"/);
 assert.match(emitCss(document), /\.frontier-Todo/);
 assert.equal(safeMergeHtmlSource({
@@ -317,3 +317,4 @@ for (const languagePackage of [ClangLanguagePackage, CSharpLanguagePackage, GoLa
   assert.equal(languagePackage.version, "0.1.19");
   assert.equal(languagePackage.compilerVersion, "0.2.331");
 }
+assert.equal(SwiftUiLanguagePackage.version, "0.1.1"); assert.equal(SwiftUiLanguagePackage.target, "swiftui");

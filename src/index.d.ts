@@ -6,6 +6,7 @@ export * from "@shapeshift-labs/frontier-lang-dialects";
 export * from "@shapeshift-labs/frontier-lang-compiler";
 export * from "@shapeshift-labs/frontier-lang-html";
 export * from "@shapeshift-labs/frontier-lang-css";
+export * from "@shapeshift-labs/frontier-lang-swiftui";
 export * from "@shapeshift-labs/frontier-lang-swift";
 export * from "@shapeshift-labs/frontier-lang-kotlin";
 export * from "@shapeshift-labs/frontier-lang-java";
@@ -163,6 +164,24 @@ export {
   emitCHeader,
   emitCHeaderWithSourceMap
 } from "@shapeshift-labs/frontier-lang-c";
+export {
+  type SwiftUiProjectionOptions,
+  type SwiftUiAstProperty,
+  type SwiftUiAstView,
+  type SwiftUiAstModule,
+  type SwiftUiProjectionResult,
+  type SwiftUiSourceMapResult,
+  SwiftUiTarget,
+  SwiftUiCompileTarget,
+  SwiftUiSupportedRenderTags,
+  SwiftUiLanguagePackage,
+  swiftUiType,
+  toSwiftUiAst,
+  renderSwiftUiAst,
+  renderSwiftUiAstWithSourceMap,
+  projectSwiftUi,
+  emitSwiftUi
+} from "@shapeshift-labs/frontier-lang-swiftui";
 
 export * as frontierLangJavaScript from "@shapeshift-labs/frontier-lang-javascript";
 export * as frontierLangDialects from "@shapeshift-labs/frontier-lang-dialects";
@@ -175,3 +194,4 @@ export * as frontierLangCss from "@shapeshift-labs/frontier-lang-css";
 export * as frontierLangRust from "@shapeshift-labs/frontier-lang-rust";
 export * as frontierLangPython from "@shapeshift-labs/frontier-lang-python";
 export * as frontierLangC from "@shapeshift-labs/frontier-lang-c";
+export * as frontierLangSwiftUi from "@shapeshift-labs/frontier-lang-swiftui";

@@ -2,6 +2,7 @@ export * from "@shapeshift-labs/frontier-lang-kernel";
 export * from "@shapeshift-labs/frontier-lang-parser";
 export * from "@shapeshift-labs/frontier-lang-checker";
 export * from "@shapeshift-labs/frontier-lang-typescript";
+export * from "@shapeshift-labs/frontier-lang-dialects";
 export * from "@shapeshift-labs/frontier-lang-compiler";
 export * from "@shapeshift-labs/frontier-lang-html";
 export * from "@shapeshift-labs/frontier-lang-css";
@@ -42,6 +43,7 @@ export {
 } from "@shapeshift-labs/frontier-lang-c";
 
 export * as frontierLangJavaScript from "@shapeshift-labs/frontier-lang-javascript";
+export * as frontierLangDialects from "@shapeshift-labs/frontier-lang-dialects";
 export * as frontierLangHtml from "@shapeshift-labs/frontier-lang-html";
 export * as frontierLangCss from "@shapeshift-labs/frontier-lang-css";
 export * as frontierLangRust from "@shapeshift-labs/frontier-lang-rust";

@@ -314,7 +314,7 @@ assert.equal(cssAtRuleFacadeMerge.status, "merged");
 assert.match(cssAtRuleFacadeMerge.outputFiles[0].sourceText, /@property --brand-hue/); assert.equal(cssAtRuleFacadeMerge.summary.cssRuntimeDescriptorEvidenceFiles, 1);
 
 for (const languagePackage of [ClangLanguagePackage, CSharpLanguagePackage, GoLanguagePackage, JavaLanguagePackage, KotlinLanguagePackage, SwiftLanguagePackage]) {
-  assert.equal(languagePackage.version, "0.1.19");
-  assert.equal(languagePackage.compilerVersion, "0.2.331");
+  assert.equal(languagePackage.version, "0.1.20");
+  assert.equal(languagePackage.compilerVersion, "0.2.351");
 }
 assert.equal(SwiftUiLanguagePackage.version, "0.1.1"); assert.equal(SwiftUiLanguagePackage.target, "swiftui");

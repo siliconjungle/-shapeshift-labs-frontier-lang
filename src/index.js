@@ -19,6 +19,52 @@ export * from "@shapeshift-labs/frontier-lang-csharp";
 export * from "@shapeshift-labs/frontier-lang-clang";
 
 export {
+  attachUniversalDialectRegistry,
+  createUniversalDialectRecord,
+  createUniversalDialectRegistry,
+  createUniversalExternRecord,
+  summarizeUniversalDialectRegistry,
+  UniversalDialectConstructKinds,
+  UniversalDialectProjectionDispositions
+} from "@shapeshift-labs/frontier-lang-dialects";
+export {
+  parseJsxSemanticTree,
+  createJsxSemanticMergeEvidence,
+  summarizeJsxSemanticTree,
+  queryJsxElementRecords
+} from "@shapeshift-labs/frontier-lang-jsx";
+export {
+  parseSvgSemanticTree,
+  createSvgSemanticMergeEvidence,
+  querySvgReferenceGraph,
+  summarizeSvgSemanticTree
+} from "@shapeshift-labs/frontier-lang-svg";
+export {
+  parsePackageManifestSemanticTree,
+  createPackageManifestSemanticMergeEvidence,
+  summarizePackageManifestSemanticTree,
+  queryPackageDependencyRecords
+} from "@shapeshift-labs/frontier-lang-package";
+export {
+  createClangAstNativeImporterAdapter
+} from "@shapeshift-labs/frontier-lang-clang";
+export {
+  createCSharpRoslynNativeImporterAdapter
+} from "@shapeshift-labs/frontier-lang-csharp";
+export {
+  createGoAstNativeImporterAdapter
+} from "@shapeshift-labs/frontier-lang-go";
+export {
+  createJavaAstNativeImporterAdapter
+} from "@shapeshift-labs/frontier-lang-java";
+export {
+  createKotlinPsiNativeImporterAdapter
+} from "@shapeshift-labs/frontier-lang-kotlin";
+export {
+  createSwiftSyntaxNativeImporterAdapter
+} from "@shapeshift-labs/frontier-lang-swift";
+
+export {
   toJavaScriptAst,
   renderJavaScriptAst,
   renderJavaScriptAstWithSourceMap,

@@ -15,6 +15,34 @@ export * from "@shapeshift-labs/frontier-lang-csharp";
 export * from "@shapeshift-labs/frontier-lang-clang";
 
 export {
+  attachUniversalDialectRegistry,
+  createUniversalDialectRecord,
+  createUniversalDialectRegistry,
+  createUniversalExternRecord,
+  summarizeUniversalDialectRegistry,
+  UniversalDialectConstructKinds,
+  UniversalDialectProjectionDispositions
+} from "@shapeshift-labs/frontier-lang-dialects";
+export {
+  createClangAstNativeImporterAdapter
+} from "@shapeshift-labs/frontier-lang-clang";
+export {
+  createCSharpRoslynNativeImporterAdapter
+} from "@shapeshift-labs/frontier-lang-csharp";
+export {
+  createGoAstNativeImporterAdapter
+} from "@shapeshift-labs/frontier-lang-go";
+export {
+  createJavaAstNativeImporterAdapter
+} from "@shapeshift-labs/frontier-lang-java";
+export {
+  createKotlinPsiNativeImporterAdapter
+} from "@shapeshift-labs/frontier-lang-kotlin";
+export {
+  createSwiftSyntaxNativeImporterAdapter
+} from "@shapeshift-labs/frontier-lang-swift";
+
+export {
   type JsxProofGap,
   type JsxPropRecord,
   type JsxElementRecord,

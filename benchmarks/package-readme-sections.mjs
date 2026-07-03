@@ -7,7 +7,9 @@ const packageRoot = path.resolve(here, '..');
 const self = fileURLToPath(import.meta.url);
 const fallbackCatalogPath = path.join(here, 'package-readme-catalog.json');
 const centralCandidates = [
-  process.env.FRONTIER_PACKAGE_README_SCRIPT
+  process.env.FRONTIER_PACKAGE_README_SCRIPT,
+  path.resolve(packageRoot, '..', 'json-diff', 'benchmarks', 'package-readme-sections.js'),
+  path.resolve(packageRoot, '..', '..', 'benchmarks', 'package-readme-sections.js')
 ].filter(Boolean);
 
 let delegated = false;

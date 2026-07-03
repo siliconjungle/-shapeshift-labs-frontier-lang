@@ -600,6 +600,14 @@
     "repoUrl": "https://github.com/siliconjungle/-shapeshift-labs-frontier-view"
   },
   {
+    "id": "frontier-collapse",
+    "name": "@shapeshift-labs/frontier-collapse",
+    "role": "Constraint-collapse and projection admission records for one Frontier program becoming many valid shapes, including identity, behavior, runtime, proof, explicit projection losses, admitted projections, rejected shapes, and target contracts for React, SwiftUI, CLI, worker routes, plugin mounts, native adapters, and local-first views.",
+    "npmUrl": "https://www.npmjs.com/package/@shapeshift-labs/frontier-collapse",
+    "repoName": "siliconjungle/-shapeshift-labs-frontier-collapse",
+    "repoUrl": "https://github.com/siliconjungle/-shapeshift-labs-frontier-collapse"
+  },
+  {
     "id": "frontier-icons",
     "name": "@shapeshift-labs/frontier-icons",
     "role": "Renderer-neutral icon records, icon sets, lookup aliases, SVG frames, string rendering, and registry evidence for Frontier apps.",

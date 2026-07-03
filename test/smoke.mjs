@@ -37,7 +37,7 @@ import {
   toTypeScriptAst,
   writeUniversalAstJson
 } from "../dist/index.js";
-import "./authored-source-smoke.mjs"; import "./css-modules-contract-smoke.mjs"; import "./dialects-smoke.mjs";
+import "./authored-source-smoke.mjs"; import "./css-modules-contract-smoke.mjs"; import "./dialects-smoke.mjs"; import "./source-syntax-bundle-smoke.mjs";
 
 function htmlRuntimeEvidence(runtimeSignal, label) { const command = `node test/html-runtime/${label}.mjs`; const probeId = `html:${runtimeSignal}:${label}`; const evidenceHash = hashSemanticValue(`html-runtime-evidence:${runtimeSignal}:${label}`); const signals = [runtimeSignal]; return { runtimeCommand: command, runtimeProbeId: probeId, runtimeEvidenceHash: evidenceHash, runtimeSignals: signals, runtimeProofCapsule: { mode: "isolated-fixture", status: "passed", command, probeId, evidenceHash, signals, telemetry: { hash: `telemetry:${label}`, domSnapshotHash: `dom:${label}`, computedStyleHash: `style:${label}`, layoutSnapshotHash: `layout:${label}`, eventTraceHash: `events:${label}`, accessibilitySnapshotHash: `accessibility:${label}`, focusSnapshotHash: `focus:${label}`, layoutShiftHash: `layout-shift:${label}`, screenshotHash: `screenshot:${label}`, cumulativeLayoutShift: 0 } } }; }
 

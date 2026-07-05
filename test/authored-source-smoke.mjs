@@ -5,6 +5,7 @@ import {
   createPackageManifestSemanticMergeEvidence,
   createSvgSemanticMergeEvidence,
   createUniversalConversionArtifactsFromFrontierSource,
+  createAuthoredFrontierSourceParityMatrix,
   createUniversalConversionPlanFromFrontierSource,
   parseFrontierSource
 } from "../dist/index.js";
@@ -54,6 +55,9 @@ assert.equal(authoredArtifacts.metadata.authoredFrontierSource.constraintSpaceSu
 
 const decisionGraphSource = `module DecisionGraphProbe @id("mod_decision_graph_probe") {
 decisionGraph MergeReview @id("decision_graph_merge_review") {
+  node patchNode @id("decision_node_patch") record patch_event_user label "Patch"
+  node decisionNode @id("decision_node_decision") record merge_decision_user label "Decision"
+  edge patchToDecision @id("decision_edge_patch_to_decision") from decision_node_patch to decision_node_decision kind causal
   panelProjection review @id("panel_projection_review") panel merge-review projectionKind readiness field status|evidence
   feedback routeCost @id("feedback_route_cost") loop route_tuning kind cost-regression subject model:gpt5 severity warning action downroute feedback "Cost exceeded lane target."
 }
@@ -66,6 +70,13 @@ const decisionGraphPlan = createUniversalConversionPlanFromFrontierSource(decisi
   fileName: "decision-graph.frontier",
   targets: ["rust"]
 });
+const decisionGraphParity = createAuthoredFrontierSourceParityMatrix({
+  plan: decisionGraphPlan,
+  includeEmptyRows: false
+});
+assert.equal(decisionGraphParity.summary.failClosed, false);
+assert.equal(rowFor(decisionGraphParity, "decisionGraph.nodes").status, "pass");
+assert.equal(rowFor(decisionGraphParity, "decisionGraph.edges").status, "pass");
 assert.equal(decisionGraphPlan.metadata.authoredFrontierSource.decisionGraphPanelProjectionIds.includes("panel_projection_review"), true);
 assert.equal(decisionGraphPlan.metadata.authoredFrontierSource.decisionGraphFeedbackIds.includes("feedback_route_cost"), true);
 const decisionGraphArtifacts = createUniversalConversionArtifactsFromFrontierSource(decisionGraphSource, {
@@ -80,3 +91,9 @@ assert.equal(createJsxSemanticMergeEvidence("export const View = () => <button k
 assert.equal(createSvgSemanticMergeEvidence("<svg><defs><linearGradient id=\"brand\" /></defs><rect fill=\"url(#brand)\" /></svg>").summary.missingReferences, 0);
 assert.equal(createPackageManifestSemanticMergeEvidence("{\"name\":\"demo\",\"dependencies\":{\"left-pad\":\"1.3.0\"}}\n").summary.dependencies, 1);
 assert.equal(createAssemblySemanticMergeEvidence("start:\n  lda #$01\n  rts\n", { dialect: "snes-asm" }).summary.instructions, 2);
+
+function rowFor(matrix, parserPath) {
+  const row = matrix.rows.find((candidate) => candidate.parserPath === parserPath);
+  assert.ok(row, `expected parity row for ${parserPath}`);
+  return row;
+}

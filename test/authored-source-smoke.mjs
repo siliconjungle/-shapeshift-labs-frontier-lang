@@ -88,6 +88,37 @@ assert.equal(decisionGraphArtifacts.index.decisionGraphFeedbackIds.includes("fee
 assert.equal(decisionGraphArtifacts.summary.compactCounts.decisionGraph.panelProjections.panel_projection_review, decisionGraphArtifacts.routeArtifacts.length);
 assert.equal(decisionGraphArtifacts.summary.compactCounts.decisionGraph.feedback.feedback_route_cost, decisionGraphArtifacts.routeArtifacts.length);
 
+const gateAdmissionSource = `module GateAdmissionProbe @id("mod_gate_admission_probe") {
+gateEvidence MergeAdmission @id("gate_admission_merge") {
+  gate typecheck @id("gate_admission_typecheck") kind typecheck status passed required command "npm run typecheck" route conversion_frontier_to_rust sourceLanguage frontier target rust sourcePath gate.frontier sourceHash sha256:frontier outputHash sha256:typecheck evidence evidence_gate_typecheck proofEvidence evidence_gate_replay missingEvidence runtime-proof
+  evidence typecheck @id("evidence_gate_typecheck") kind test status passed path reports/typecheck.json command "npm run typecheck" route conversion_frontier_to_rust sourceLanguage frontier target rust sourceHash sha256:frontier outputHash sha256:typecheck gate gate_admission_typecheck summary "Type gate passed."
+  proofEvidence replay @id("evidence_gate_replay") kind replay status missing route conversion_frontier_to_rust sourceLanguage frontier target rust gate gate_admission_typecheck hash sha256:replay summary "Replay proof still missing."
+  admission merge @id("gate_admission_review") status ready action review readiness needs-review decision review classification bounded route conversion_frontier_to_rust sourceLanguage frontier target rust gate gate_admission_typecheck evidence evidence_gate_typecheck proofEvidence evidence_gate_replay missingEvidence runtime-proof reasonCode needs-runtime-proof
+  proofObligation runtimeProbe @id("gate_admission_runtime_obligation") kind runtime-proof status missing route conversion_frontier_to_rust sourceLanguage frontier target rust gate gate_admission_typecheck admission gate_admission_review evidence evidence_gate_typecheck proofEvidence evidence_gate_replay requiredSignal telemetry-hash providedSignal source-hash missingSignal telemetry-hash missingEvidence runtime-proof reasonCode needs-runtime-proof
+  proofGap runtimeProbe @id("gate_admission_runtime_gap") code runtime-proof status missing route conversion_frontier_to_rust admission gate_admission_review summary "Runtime proof is required before auto admission."
+}
+conversion FrontierToRust @id("conversion_frontier_rust") {
+  sourceLanguage frontier
+  target rust
+}
+}`;
+const gateAdmissionPlan = createUniversalConversionPlanFromFrontierSource(gateAdmissionSource, {
+  fileName: "gate-admission.frontier",
+  targets: ["rust"]
+});
+const gateAdmissionParity = createAuthoredFrontierSourceParityMatrix({
+  plan: gateAdmissionPlan,
+  includeEmptyRows: false
+});
+assert.equal(rowFor(gateAdmissionParity, "gateAdmissionEvidence.gateIds").status, "pass");
+assert.equal(rowFor(gateAdmissionParity, "gateAdmissionEvidence.proofObligations.requiredSignals").status, "pass");
+assert.equal(rowFor(gateAdmissionParity, "gateAdmissionEvidence.proofGaps.code").status, "pass");
+assert.equal(gateAdmissionPlan.metadata.authoredFrontierSource.gateAdmissionEvidenceId, "gate_admission_merge");
+assert.equal(gateAdmissionPlan.metadata.authoredFrontierSource.gateAdmissionGateIds.includes("gate_admission_typecheck"), true);
+assert.equal(gateAdmissionPlan.metadata.authoredFrontierSource.gateAdmissionProofEvidenceIds.includes("evidence_gate_replay"), true);
+assert.equal(gateAdmissionPlan.metadata.authoredFrontierSource.gateAdmissionProofObligationIds.includes("gate_admission_runtime_obligation"), true);
+assert.equal(gateAdmissionPlan.metadata.authoredFrontierSource.gateAdmissionMissingSignals.includes("telemetry-hash"), true);
+
 const machineGraphSource = `module MachineGraphProbe @id("mod_machine_graph_probe") {
 machineGraph CounterLoop @id("machine_graph_counter_loop") {
   sourceLanguage assembly

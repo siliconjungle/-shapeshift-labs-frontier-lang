@@ -218,6 +218,46 @@ assert.equal(machineGraphPlan.metadata.authoredFrontierSource.machineGraphContro
 assert.equal(machineGraphPlan.metadata.authoredFrontierSource.machineGraphFailClosedTrapIds.includes("machine_trap_nmi_vector"), true);
 assert.equal(machineGraphPlan.metadata.authoredFrontierSource.machineGraphMissingEvidence.includes("machine-trap-trace"), true);
 
+const semanticEditSource = `module SemanticEditParityProbe @id("mod_semantic_edit_parity_probe") {
+target rust @id("target_rust") {
+  targetLanguage rust
+  source frontier
+  targetPath src/generated/user.rs
+  projection rustAdapter @id("target_projection_rust") readiness needs-review adapter rust_codegen represented semantic-symbol evidence evidence_projection proof evidence_projection
+}
+conversion FrontierToRust @id("conversion_frontier_rust") {
+  sourceLanguage frontier
+  target rust
+  evidence projection @id("evidence_projection") kind conversion-replay-proof status passed route conversion_frontier_to_rust sourceLanguage frontier target rust
+}
+operations ProjectionOps @id("ops_projection") {
+  operation projectUser @id("op_projection") op projection language frontier target rust semanticNode node:User sourceMap source_map_projection sourceMapLink source_map_link_projection sourceMapMapping map_projection evidence evidence_projection semanticKey function:projectUser semanticIdentityHash semantic_hash_projection sourceIdentityHash source_hash_projection operationContentHash operation_hash_projection editContentHash edit_hash_projection replayStatus accepted-clean replayOutputHash output_hash_projection transformIdentityHash transform_hash_projection transformContentHash transform_content_hash_projection projectionIdentityHash projection_hash_projection sourceBackprojection exact-source
+}
+semanticEdits ProjectionEdits @id("semantic_edits_projection") {
+  script projectUser @id("script_projection") language frontier target rust sourcePath user.frontier targetPath src/generated/user.rs route conversion_frontier_to_rust status ready operation op_projection semanticKey function:projectUser semanticIdentityHash semantic_hash_projection sourceIdentityHash source_hash_projection operationContentHash operation_hash_projection editContentHash edit_hash_projection sourceBackprojection exact-source sourceMap source_map_projection sourceMapLink source_map_link_projection sourceMapMapping map_projection evidence evidence_projection
+  projection projectUser @id("projection_projection") script script_projection language frontier target rust sourcePath user.frontier targetPath src/generated/user.rs route conversion_frontier_to_rust status projected edit op_projection semanticKey function:projectUser semanticIdentityHash semantic_hash_projection sourceIdentityHash source_hash_projection operationContentHash operation_hash_projection editContentHash edit_hash_projection sourceMap source_map_projection sourceMapLink source_map_link_projection sourceMapMapping map_projection evidence evidence_projection
+  replay projectUser @id("replay_projection") script script_projection projection projection_projection language frontier target rust sourcePath user.frontier route conversion_frontier_to_rust status accepted-clean action apply outputHash output_hash_projection edit op_projection semanticKey function:projectUser semanticIdentityHash semantic_hash_projection sourceIdentityHash source_hash_projection operationContentHash operation_hash_projection editContentHash edit_hash_projection evidence evidence_projection
+}
+}`;
+const semanticEditPlan = createUniversalConversionPlanFromFrontierSource(semanticEditSource, {
+  fileName: "semantic-edit.frontier",
+  targets: ["rust"]
+});
+const semanticEditAuthored = semanticEditPlan.metadata.authoredFrontierSource;
+const semanticEditParity = createAuthoredFrontierSourceParityMatrix({
+  plan: semanticEditPlan,
+  includeEmptyRows: false
+});
+assert.equal(semanticEditAuthored.semanticEditScriptIds.includes("script_projection"), true);
+assert.equal(semanticEditAuthored.semanticTransformIdentityHashes.includes("transform_hash_projection"), true);
+assert.equal(semanticEditAuthored.transformSourceMapIds.includes("source_map_projection"), true);
+assert.equal(semanticEditAuthored.targetProjectionIds.includes("target_projection_rust"), true);
+assert.equal(rowForEntry(semanticEditParity, "semanticOperations.operations.semanticKey", "semanticEditKeys").status, "pass");
+assert.equal(rowForEntry(semanticEditParity, "semanticOperations.operations.transformIdentityHash", "semanticTransformIdentityHashes").status, "pass");
+assert.equal(rowForEntry(semanticEditParity, "semanticOperations.operations.sourceMapIds", "transformSourceMapIds").status, "pass");
+assert.equal(rowForEntry(semanticEditParity, "semanticEditRecords.scriptIds", "semanticEditScriptIds").status, "pass");
+assert.equal(rowForEntry(semanticEditParity, "targetProjections.projectionContractIds", "targetProjectionIds").status, "pass");
+
 assert.equal(createJsxSemanticMergeEvidence("export const View = () => <button key=\"save\">Save</button>;\n").summary.keyedElements, 1);
 assert.equal(createSvgSemanticMergeEvidence("<svg><defs><linearGradient id=\"brand\" /></defs><rect fill=\"url(#brand)\" /></svg>").summary.missingReferences, 0);
 assert.equal(createPackageManifestSemanticMergeEvidence("{\"name\":\"demo\",\"dependencies\":{\"left-pad\":\"1.3.0\"}}\n").summary.dependencies, 1);
@@ -226,5 +266,11 @@ assert.equal(createAssemblySemanticMergeEvidence("start:\n  lda #$01\n  rts\n", 
 function rowFor(matrix, parserPath) {
   const row = matrix.rows.find((candidate) => candidate.parserPath === parserPath);
   assert.ok(row, `expected parity row for ${parserPath}`);
+  return row;
+}
+
+function rowForEntry(matrix, parserPath, authoredKey) {
+  const row = matrix.rows.find((candidate) => candidate.parserPath === parserPath && candidate.authoredKey === authoredKey);
+  assert.ok(row, `expected parity row for ${parserPath} -> ${authoredKey}`);
   return row;
 }

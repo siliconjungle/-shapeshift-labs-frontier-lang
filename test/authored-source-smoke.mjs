@@ -111,12 +111,15 @@ const gateAdmissionParity = createAuthoredFrontierSourceParityMatrix({
   includeEmptyRows: false
 });
 assert.equal(rowFor(gateAdmissionParity, "gateAdmissionEvidence.gateIds").status, "pass");
+assert.equal(rowFor(gateAdmissionParity, "gateAdmissionEvidence.blockIds").status, "pass");
+assert.equal(rowFor(gateAdmissionParity, "gateAdmissionEvidence.missingEvidence").status, "pass");
 assert.equal(rowFor(gateAdmissionParity, "gateAdmissionEvidence.proofObligations.requiredSignals").status, "pass");
 assert.equal(rowFor(gateAdmissionParity, "gateAdmissionEvidence.proofGaps.code").status, "pass");
 assert.equal(gateAdmissionPlan.metadata.authoredFrontierSource.gateAdmissionEvidenceId, "gate_admission_merge");
 assert.equal(gateAdmissionPlan.metadata.authoredFrontierSource.gateAdmissionGateIds.includes("gate_admission_typecheck"), true);
 assert.equal(gateAdmissionPlan.metadata.authoredFrontierSource.gateAdmissionProofEvidenceIds.includes("evidence_gate_replay"), true);
 assert.equal(gateAdmissionPlan.metadata.authoredFrontierSource.gateAdmissionProofObligationIds.includes("gate_admission_runtime_obligation"), true);
+assert.equal(gateAdmissionPlan.metadata.authoredFrontierSource.gateAdmissionMissingEvidence.includes("telemetry-hash"), true);
 assert.equal(gateAdmissionPlan.metadata.authoredFrontierSource.gateAdmissionMissingSignals.includes("telemetry-hash"), true);
 
 const parserFailClosedSource = `module ParserFailClosedProbe @id("mod_parser_fail_closed_probe") {

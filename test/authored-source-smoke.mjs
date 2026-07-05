@@ -122,6 +122,44 @@ assert.equal(gateAdmissionPlan.metadata.authoredFrontierSource.gateAdmissionProo
 assert.equal(gateAdmissionPlan.metadata.authoredFrontierSource.gateAdmissionMissingEvidence.includes("telemetry-hash"), true);
 assert.equal(gateAdmissionPlan.metadata.authoredFrontierSource.gateAdmissionMissingSignals.includes("telemetry-hash"), true);
 
+const nativeSourceParitySource = `module NativeSourceParityProbe @id("mod_native_source_parity_probe") {
+nativeSource TodoTs @id("native_todo_ts") {
+  language typescript
+  parser typescript
+  parserVersion 5.9
+  sourcePath src/todo.ts
+  sourceHash sha256:todo
+  symbol symbol:Todo.title
+  frontierNode field_title
+  evidence nativeProbe @id("evidence_native_probe") kind parser status passed path reports/native.json
+  sourceMap todoProjection @id("sourcemap_todo_ts") target typescript targetPath src/generated/todo.ts sourceHash sha256:todo targetHash sha256:generated evidence evidence_native_probe nativeAst ast_todo semanticIndex index_todo universalAst universal_ast_todo
+  mapping todoTitle @id("map_todo_title") sourceMap sourcemap_todo_ts semanticNode field_title nativeSource native_todo_ts semanticSymbol symbol:Todo.title semanticOccurrence occurrence:Todo.title nativeAstNode ts_node_title mergeCandidate candidate_todo_title precision exact preservation identity ownershipRegion region_todo ownershipKey symbol:Todo.title evidence evidence_native_probe loss loss_TodoTs_0
+  mergeCandidate todoTitle @id("candidate_todo_title") language typescript sourcePath src/todo.ts baseHash h_base targetHash h_worker symbol symbol:Todo.title semanticNode field_title conflictKey symbol:Todo.title ownershipKey symbol:Todo.title readiness ready evidence evidence_native_probe sourceMap sourcemap_todo_ts sourceMapMapping map_todo_title nativeAstNode ts_node_title reasonCode exact-source
+  loss unsupportedSyntax "decorator retained in native AST" severity warning
+}
+conversion TypescriptToRust @id("conversion_typescript_rust") {
+  sourceLanguage typescript
+  target rust
+}
+}`;
+const nativeSourceParityPlan = createUniversalConversionPlanFromFrontierSource(nativeSourceParitySource, {
+  fileName: "native-source-parity.frontier",
+  targets: ["rust"]
+});
+const nativeSourceAuthored = nativeSourceParityPlan.metadata.authoredFrontierSource;
+const nativeSourceParity = createAuthoredFrontierSourceParityMatrix({
+  plan: nativeSourceParityPlan,
+  includeEmptyRows: false
+});
+assert.equal(nativeSourceAuthored.universalAstNativeSourceIds.includes("native_todo_ts"), true);
+assert.equal(nativeSourceAuthored.sourceMapSemanticSymbolIds.includes("symbol:Todo.title"), true);
+assert.equal(nativeSourceAuthored.mergeCandidateConflictKeys.includes("symbol:Todo.title"), true);
+assert.equal(rowFor(nativeSourceParity, "nativeSources.sources").status, "pass");
+assert.equal(rowFor(nativeSourceParity, "universalAst.sourceMaps.mappings").status, "pass");
+assert.equal(rowFor(nativeSourceParity, "universalAst.mergeCandidates").status, "pass");
+assert.equal(rowFor(nativeSourceParity, "universalAst.losses.kind").status, "pass");
+assert.deepEqual(nativeSourceParity.uncoveredParserFields.filter((field) => field.values.length), []);
+
 const parserFailClosedSource = `module ParserFailClosedProbe @id("mod_parser_fail_closed_probe") {
 runtimeCapabilities ParserFailClosedRuntime @id("runtime_caps_parser_fail_closed") {
   host jsWeb @id("runtime_host_js_web") runtime javascript environment browser

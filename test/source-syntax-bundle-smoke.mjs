@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { compileFrontierSourceBundle, inspectFrontierSourceSyntax, parseFrontierSource } from "../dist/index.js";
+import { compileFrontierSourceBundle, createUniversalConversionPlanFromFrontierSource, inspectFrontierSourceSyntax, parseFrontierSource } from "../dist/index.js";
 
 const source = `module SyntaxProbe @id("mod_syntax_probe") {
 view TodoView @id("view_todo") {
@@ -38,6 +38,27 @@ assert.equal(spanCommand.sourceSpan.path, "src/draw.js");
 assert.equal(spanCommand.authoredSourceSpan.path, "umbrella-source-spans.frontier");
 assert.equal(spanMount.sourceSpan.path, "app.tsx");
 assert.equal(spanMount.authoredSourceSpan.path, "umbrella-source-spans.frontier");
+
+const resourceConcurrencySource = `module ResourceConcurrency @id("mod_resource_concurrency") {
+resourceGraph RuntimeResources @id("resource_graph_runtime") {
+  sourceLanguage javascript
+  coroutine asyncRuntime @id("coroutine_scope_runtime") runtime js-event-loop scheduler promise-microtask structured proofStatus missing
+  fiber asyncWorker @id("green_thread_runtime") scope coroutine_scope_runtime runtime js-event-loop scheduler promise-microtask stack heap proofStatus missing
+}
+conversion JsToRust @id("conversion_js_rust") {
+  sourceLanguage javascript
+  target rust
+}
+}`;
+const resourceConcurrencyDoc = parseFrontierSource(resourceConcurrencySource, { sourcePath: "resource-concurrency.frontier" });
+assert.equal(resourceConcurrencyDoc.metadata.semanticResourceGraphs.coroutineScopeIds[0], "coroutine_scope_runtime");
+assert.equal(resourceConcurrencyDoc.metadata.semanticResourceGraphs.greenThreadIds[0], "green_thread_runtime");
+const resourceConcurrencyPlan = createUniversalConversionPlanFromFrontierSource(resourceConcurrencySource, {
+  fileName: "resource-concurrency.frontier",
+  targets: ["rust"]
+});
+assert.equal(resourceConcurrencyPlan.metadata.authoredFrontierSource.semanticResourceGraphCoroutineScopeIds[0], "coroutine_scope_runtime");
+assert.equal(resourceConcurrencyPlan.metadata.authoredFrontierSource.semanticResourceGraphGreenThreadIds[0], "green_thread_runtime");
 
 const malformedBundle = compileFrontierSourceBundle(`module Broken @id("mod_broken") {
 entity Todo @id("ent_todo") {

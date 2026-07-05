@@ -119,6 +119,32 @@ assert.equal(gateAdmissionPlan.metadata.authoredFrontierSource.gateAdmissionProo
 assert.equal(gateAdmissionPlan.metadata.authoredFrontierSource.gateAdmissionProofObligationIds.includes("gate_admission_runtime_obligation"), true);
 assert.equal(gateAdmissionPlan.metadata.authoredFrontierSource.gateAdmissionMissingSignals.includes("telemetry-hash"), true);
 
+const parserFailClosedSource = `module ParserFailClosedProbe @id("mod_parser_fail_closed_probe") {
+runtimeCapabilities ParserFailClosedRuntime @id("runtime_caps_parser_fail_closed") {
+  host jsWeb @id("runtime_host_js_web") runtime javascript environment browser
+  schedulerMagic workStealing @id("runtime_scheduler_magic")
+}
+conversion FrontierToRust @id("conversion_frontier_rust") {
+  sourceLanguage frontier
+  target rust
+}
+}`;
+const parserFailClosedPlan = createUniversalConversionPlanFromFrontierSource(parserFailClosedSource, {
+  fileName: "parser-fail-closed.frontier",
+  targets: ["rust"]
+});
+const parserFailClosedAuthored = parserFailClosedPlan.metadata.authoredFrontierSource;
+const parserFailClosedParity = createAuthoredFrontierSourceParityMatrix({
+  plan: parserFailClosedPlan,
+  includeEmptyRows: false
+});
+assert.equal(parserFailClosedAuthored.parserFailClosedProofGapCodes.includes("unsupported-runtime-capability-row"), true);
+assert.equal(parserFailClosedAuthored.parserFailClosedUnknownRowIds.includes("runtime_scheduler_magic"), true);
+assert.equal(parserFailClosedAuthored.parserFailClosedMissingEvidence.includes("parser-fail-closed:unsupported-runtime-capability-row"), true);
+assert.equal(rowFor(parserFailClosedParity, "parserFailClosed.unknownRowIds").status, "pass");
+assert.equal(rowFor(parserFailClosedParity, "parserFailClosed.proofGapCodes").status, "pass");
+assert.equal(rowFor(parserFailClosedParity, "parserFailClosed.missingEvidence").status, "pass");
+
 const machineGraphSource = `module MachineGraphProbe @id("mod_machine_graph_probe") {
 machineGraph CounterLoop @id("machine_graph_counter_loop") {
   sourceLanguage assembly

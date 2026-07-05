@@ -51,6 +51,31 @@ const authoredArtifacts = createUniversalConversionArtifactsFromFrontierSource(a
   targets: ["rust"]
 });
 assert.equal(authoredArtifacts.metadata.authoredFrontierSource.constraintSpaceSummary.admissionCount, 1);
+
+const decisionGraphSource = `module DecisionGraphProbe @id("mod_decision_graph_probe") {
+decisionGraph MergeReview @id("decision_graph_merge_review") {
+  panelProjection review @id("panel_projection_review") panel merge-review projectionKind readiness field status|evidence
+  feedback routeCost @id("feedback_route_cost") loop route_tuning kind cost-regression subject model:gpt5 severity warning action downroute feedback "Cost exceeded lane target."
+}
+conversion FrontierToRust @id("conversion_frontier_rust") {
+  sourceLanguage frontier
+  target rust
+}
+}`;
+const decisionGraphPlan = createUniversalConversionPlanFromFrontierSource(decisionGraphSource, {
+  fileName: "decision-graph.frontier",
+  targets: ["rust"]
+});
+assert.equal(decisionGraphPlan.metadata.authoredFrontierSource.decisionGraphPanelProjectionIds.includes("panel_projection_review"), true);
+assert.equal(decisionGraphPlan.metadata.authoredFrontierSource.decisionGraphFeedbackIds.includes("feedback_route_cost"), true);
+const decisionGraphArtifacts = createUniversalConversionArtifactsFromFrontierSource(decisionGraphSource, {
+  fileName: "decision-graph.frontier",
+  targets: ["rust"]
+});
+assert.equal(decisionGraphArtifacts.index.decisionGraphPanelProjectionIds.includes("panel_projection_review"), true);
+assert.equal(decisionGraphArtifacts.index.decisionGraphFeedbackIds.includes("feedback_route_cost"), true);
+assert.equal(decisionGraphArtifacts.summary.compactCounts.decisionGraph.panelProjections.panel_projection_review, decisionGraphArtifacts.routeArtifacts.length);
+assert.equal(decisionGraphArtifacts.summary.compactCounts.decisionGraph.feedback.feedback_route_cost, decisionGraphArtifacts.routeArtifacts.length);
 assert.equal(createJsxSemanticMergeEvidence("export const View = () => <button key=\"save\">Save</button>;\n").summary.keyedElements, 1);
 assert.equal(createSvgSemanticMergeEvidence("<svg><defs><linearGradient id=\"brand\" /></defs><rect fill=\"url(#brand)\" /></svg>").summary.missingReferences, 0);
 assert.equal(createPackageManifestSemanticMergeEvidence("{\"name\":\"demo\",\"dependencies\":{\"left-pad\":\"1.3.0\"}}\n").summary.dependencies, 1);

@@ -53,6 +53,7 @@ const targetProjectionBundle = compileFrontierSourceBundle(`module TargetProject
 conversion TsToRust @id("conversion_ts_rust") {
   sourceLanguage typescript
   target rust
+  evidence routeReplay @id("evidence_conversion_replay") kind conversion-replay-proof status passed route conversion_ts_rust sourceLanguage typescript target rust
 }
 target rust @id("target_rust") {
   targetLanguage rust
@@ -82,9 +83,14 @@ assert.equal(targetProjectionBundle.document.nodes.target_rust.target.sourceLang
 assert.equal(targetProjectionBundle.document.nodes.target_rust.target.sourceHash, "sha256:frontier");
 assert.equal(targetProjectionBundle.document.nodes.target_rust.target.targetHash, "sha256:rust");
 assert.equal(targetProjectionBundle.sourceSyntax.summary.sourceSyntaxRowFamilyCountsByBlockFamily.target.sourceLanguage, 1);
+assert.equal(targetProjectionBundle.conversionPlan.metadata.authoredFrontierSource.conversionEvidenceIds.includes("evidence_conversion_replay"), true);
 assert.equal(targetProjectionBundle.conversionPlan.metadata.authoredFrontierSource.targetProjectionTargets.includes("rust"), true);
+assert.equal(targetProjectionBundle.conversionPlan.metadata.authoredFrontierSource.targetProjectionTargetIds.includes("target_rust"), true);
+assert.equal(targetProjectionBundle.conversionPlan.metadata.authoredFrontierSource.targetProjectionEmitPaths.includes("src/generated/todo.rs"), true);
 assert.equal(targetProjectionBundle.conversionPlan.metadata.authoredFrontierSource.targetProjectionEvidenceIds.includes("artifact_projection"), true);
+assert.equal(targetProjectionBundle.conversionPlan.metadata.authoredFrontierSource.targetProjectionTargetEvidenceIds.includes("artifact_projection"), true);
 assert.equal(targetProjectionBundle.conversionPlan.metadata.authoredFrontierSource.targetProjectionSourceMapIds.includes("target_sourcemap_rust"), true);
 assert.equal(targetProjectionBundle.conversionPlan.metadata.authoredFrontierSource.targetProjectionLossIds.includes("loss_borrow"), true);
+assert.equal(targetProjectionBundle.conversionPlan.metadata.authoredFrontierSource.targetProjectionTargetLossIds.includes("loss_borrow"), true);
 assert.equal(targetProjectionBundle.conversionPlan.metadata.authoredFrontierSource.targetProjectionMissingEvidence.includes("browser-runtime-proof"), true);
 assert.equal(targetProjectionBundle.conversionPlan.metadata.authoredFrontierSource.targetProjectionReadinesses.includes("needs-review"), true);

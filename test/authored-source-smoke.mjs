@@ -87,6 +87,39 @@ assert.equal(decisionGraphArtifacts.index.decisionGraphPanelProjectionIds.includ
 assert.equal(decisionGraphArtifacts.index.decisionGraphFeedbackIds.includes("feedback_route_cost"), true);
 assert.equal(decisionGraphArtifacts.summary.compactCounts.decisionGraph.panelProjections.panel_projection_review, decisionGraphArtifacts.routeArtifacts.length);
 assert.equal(decisionGraphArtifacts.summary.compactCounts.decisionGraph.feedback.feedback_route_cost, decisionGraphArtifacts.routeArtifacts.length);
+
+const machineGraphSource = `module MachineGraphProbe @id("mod_machine_graph_probe") {
+machineGraph CounterLoop @id("machine_graph_counter_loop") {
+  sourceLanguage assembly
+  sourcePath src/counter.asm
+  evidence evidence_counter_trace
+  label loop @id("label_loop") address $808000 evidence evidence_counter_trace
+  instruction bne @id("instruction_bne") mnemonic BNE opcode D0 proofStatus missing reasonCode machine-branch-instruction-proof-missing evidence evidence_counter_trace
+  branch loopBranch @id("branch_loop") from instruction_bne to label_loop kind conditional proofStatus missing reasonCode machine-branch-proof-missing sourceMap source_map_machine sourceMapMapping map_machine_branch proofEvidence evidence_counter_trace evidence evidence_counter_trace
+  trap vectorTrap @id("machine_trap_nmi_vector") instruction instruction_bne kind vector-missing trapCode snes-vector-oob proofStatus missing failClosed reasonCode machine-trap-vector-proof-missing proofEvidence evidence_counter_trace missingEvidence machine-trap-trace evidence evidence_counter_trace
+  missingEvidence trapTrace @id("missing_machine_trap_trace") reason machine-trap-trace severity error evidence evidence_counter_trace
+  evidence trace @id("evidence_counter_trace") kind emulator-trace status passed path reports/counter-trace.json
+}
+conversion AssemblyToRust @id("conversion_assembly_rust") {
+  sourceLanguage assembly
+  target rust
+}
+}`;
+const machineGraphPlan = createUniversalConversionPlanFromFrontierSource(machineGraphSource, {
+  fileName: "machine-graph.frontier",
+  targets: ["rust"]
+});
+const machineGraphParity = createAuthoredFrontierSourceParityMatrix({
+  plan: machineGraphPlan,
+  includeEmptyRows: false
+});
+assert.equal(rowFor(machineGraphParity, "machineGraphs.graphs.query.controlFlowEdgeIds").status, "pass");
+assert.equal(rowFor(machineGraphParity, "machineGraphs.trapIds").status, "pass");
+assert.equal(rowFor(machineGraphParity, "machineGraphs.missingEvidenceIds").status, "pass");
+assert.equal(machineGraphPlan.metadata.authoredFrontierSource.machineGraphControlFlowEdgeIds.includes("branch_loop"), true);
+assert.equal(machineGraphPlan.metadata.authoredFrontierSource.machineGraphFailClosedTrapIds.includes("machine_trap_nmi_vector"), true);
+assert.equal(machineGraphPlan.metadata.authoredFrontierSource.machineGraphMissingEvidence.includes("machine-trap-trace"), true);
+
 assert.equal(createJsxSemanticMergeEvidence("export const View = () => <button key=\"save\">Save</button>;\n").summary.keyedElements, 1);
 assert.equal(createSvgSemanticMergeEvidence("<svg><defs><linearGradient id=\"brand\" /></defs><rect fill=\"url(#brand)\" /></svg>").summary.missingReferences, 0);
 assert.equal(createPackageManifestSemanticMergeEvidence("{\"name\":\"demo\",\"dependencies\":{\"left-pad\":\"1.3.0\"}}\n").summary.dependencies, 1);

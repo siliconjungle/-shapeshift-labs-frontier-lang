@@ -29,6 +29,22 @@ assert.equal(malformedBundle.summary.sourceSyntaxMalformedBlocks, 1);
 assert.equal(malformedBundle.summary.sourceSyntaxDiagnostics, 2);
 assert.equal(malformedBundle.metadata.sourceSyntaxFailClosed, true);
 
+const proofAliasBundle = compileFrontierSourceBundle(`module ProofAliasProbe @id("mod_proof_alias_probe") {
+proof MergeProof @id("proof_merge") {
+  proofObligation replay @id("obligation_replay") kind runtime status missing subject action_merge contract contract_merge evidence evidence_replay missingEvidence runtime-proof
+}
+target typescript @id("target_typescript") {
+  language typescript
+  emitPath src/generated/proof-alias.ts
+}
+}`, { fileName: "proof-alias.frontier", targetLanguages: ["typescript"] });
+
+assert.equal(proofAliasBundle.ok, true);
+assert.equal(proofAliasBundle.summary.sourceSyntaxUnknownChildRows, 0);
+assert.equal(proofAliasBundle.summary.sourceSyntaxRowFamilyCountsByBlockFamily.proof.obligation, 1);
+assert.equal(proofAliasBundle.document.metadata.proof.obligations[0].id, "obligation_replay");
+assert.equal(proofAliasBundle.conversionPlan.metadata.authoredFrontierSource.proofSummary.obligations, 1);
+
 const targetProjectionBundle = compileFrontierSourceBundle(`module TargetProjectionProbe @id("mod_target_projection_probe") {
 conversion TsToRust @id("conversion_ts_rust") {
   sourceLanguage typescript

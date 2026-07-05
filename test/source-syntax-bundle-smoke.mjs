@@ -28,3 +28,40 @@ assert.equal(malformedBundle.sourceSyntax.summary.failClosed, true);
 assert.equal(malformedBundle.summary.sourceSyntaxMalformedBlocks, 1);
 assert.equal(malformedBundle.summary.sourceSyntaxDiagnostics, 2);
 assert.equal(malformedBundle.metadata.sourceSyntaxFailClosed, true);
+
+const targetProjectionBundle = compileFrontierSourceBundle(`module TargetProjectionProbe @id("mod_target_projection_probe") {
+conversion TsToRust @id("conversion_ts_rust") {
+  sourceLanguage typescript
+  target rust
+}
+target rust @id("target_rust") {
+  targetLanguage rust
+  source typescript
+  packageName example_todo
+  targetPath src/generated/todo.rs
+  path src/todo.frontier
+  sourceHash sha256:frontier
+  targetHash sha256:rust
+  runtime native
+  runtimeHost rust-cli
+  moduleFormat crate
+  projection rustAdapter @id("target_projection_rust") disposition target-adapter readiness needs-review adapter rust_codegen represented semantic-symbol evidence artifact_projection proof artifact_projection loss loss_borrow_scope missingEvidence translation-borrow-scope
+  proofEvidence projectionRun @id("artifact_projection") kind conversion-replay-proof status passed path reports/projection.json sourceHash sha256:frontier targetHash sha256:rust
+  sourceMap generatedRust @id("target_sourcemap_rust") sourcePath src/todo.frontier targetPath src/generated/todo.rs sourceHash sha256:frontier targetHash sha256:rust evidence artifact_projection
+  loss borrowScope @id("loss_borrow") kind ownership severity warning evidence artifact_projection
+  gap runtimeProbe @id("target_gap_runtime_probe") code runtime-proof-missing status missing missingEvidence browser-runtime-proof
+}
+}`, {
+  fileName: "target-projection.frontier",
+  targetLanguages: ["rust"],
+  conversion: { targets: ["rust"], generatedAt: 1702 }
+});
+
+assert.equal(targetProjectionBundle.ok, true);
+assert.equal(targetProjectionBundle.document.nodes.target_rust.target.sourceLanguage, "typescript");
+assert.equal(targetProjectionBundle.document.nodes.target_rust.target.sourceHash, "sha256:frontier");
+assert.equal(targetProjectionBundle.document.nodes.target_rust.target.targetHash, "sha256:rust");
+assert.equal(targetProjectionBundle.sourceSyntax.summary.sourceSyntaxRowFamilyCountsByBlockFamily.target.sourceLanguage, 1);
+assert.equal(targetProjectionBundle.conversionPlan.metadata.authoredFrontierSource.targetProjectionEvidenceIds.includes("artifact_projection"), true);
+assert.equal(targetProjectionBundle.conversionPlan.metadata.authoredFrontierSource.targetProjectionLossIds.includes("loss_borrow"), true);
+assert.equal(targetProjectionBundle.conversionPlan.metadata.authoredFrontierSource.targetProjectionMissingEvidence.includes("browser-runtime-proof"), true);

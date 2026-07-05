@@ -10,7 +10,7 @@ import {
   createSemanticImportSidecar,
   CSharpLanguagePackage,
   createUniversalConversionArtifacts,
-  createUniversalCapabilityMatrix,
+  createUniversalCapabilityMatrix, createUniversalLanguageCoverageMatrix,
   createUniversalAstFromDocument,
   createPatch,
   emitCHeader,
@@ -88,7 +88,7 @@ action addTodo @id("action_add_todo") {
 
 const document = parseFrontierSource(source);
 assert.equal(document.id, "mod_todo");
-assert.equal(checkDocument(document, { strictEffects: true }).ok, true);
+assert.equal(checkDocument(document, { strictEffects: true }).ok, true); const languageCoverageById = Object.fromEntries(createUniversalLanguageCoverageMatrix({ languageDenominator: ["unison", "wasm"] }).languages.map((row) => [row.id, row])); assert.equal(languageCoverageById.unison.package.promotion.status, "needs-package-evidence"); assert.equal(languageCoverageById.unison.package.promotion.missingEvidenceKeys.includes("semanticeditadmissionfixture"), true); assert.equal(languageCoverageById.wasm.package.promotion.targetStatuses.includes("target-projection"), true);
 
 const baseHash = hashDocumentBase(document);
 const rename = createPatch({

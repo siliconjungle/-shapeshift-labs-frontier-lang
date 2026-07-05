@@ -31,6 +31,7 @@ assert.equal(malformedBundle.metadata.sourceSyntaxFailClosed, true);
 
 const proofAliasBundle = compileFrontierSourceBundle(`module ProofAliasProbe @id("mod_proof_alias_probe") {
 proof MergeProof @id("proof_merge") {
+  contract mergeContract @id("contract_merge") kind invariant subject action_merge statement "Merge action keeps proof source map identity." sourceMap source_map_proof sourceMapMapping map_proof_contract evidence evidence_replay
   proofObligation replay @id("obligation_replay") kind runtime status missing subject action_merge contract contract_merge evidence evidence_replay missingEvidence runtime-proof
 }
 target typescript @id("target_typescript") {
@@ -41,7 +42,10 @@ target typescript @id("target_typescript") {
 
 assert.equal(proofAliasBundle.ok, true);
 assert.equal(proofAliasBundle.summary.sourceSyntaxUnknownChildRows, 0);
+assert.equal(proofAliasBundle.summary.sourceSyntaxRowFamilyCountsByBlockFamily.proof.contract, 1);
 assert.equal(proofAliasBundle.summary.sourceSyntaxRowFamilyCountsByBlockFamily.proof.obligation, 1);
+assert.equal(proofAliasBundle.conversionPlan.metadata.authoredFrontierSource.proofSourceMapIds.includes("source_map_proof"), true);
+assert.equal(proofAliasBundle.conversionPlan.metadata.authoredFrontierSource.proofSourceMapMappingIds.includes("map_proof_contract"), true);
 assert.equal(proofAliasBundle.document.metadata.proof.obligations[0].id, "obligation_replay");
 assert.equal(proofAliasBundle.conversionPlan.metadata.authoredFrontierSource.proofSummary.obligations, 1);
 
@@ -78,6 +82,9 @@ assert.equal(targetProjectionBundle.document.nodes.target_rust.target.sourceLang
 assert.equal(targetProjectionBundle.document.nodes.target_rust.target.sourceHash, "sha256:frontier");
 assert.equal(targetProjectionBundle.document.nodes.target_rust.target.targetHash, "sha256:rust");
 assert.equal(targetProjectionBundle.sourceSyntax.summary.sourceSyntaxRowFamilyCountsByBlockFamily.target.sourceLanguage, 1);
+assert.equal(targetProjectionBundle.conversionPlan.metadata.authoredFrontierSource.targetProjectionTargets.includes("rust"), true);
 assert.equal(targetProjectionBundle.conversionPlan.metadata.authoredFrontierSource.targetProjectionEvidenceIds.includes("artifact_projection"), true);
+assert.equal(targetProjectionBundle.conversionPlan.metadata.authoredFrontierSource.targetProjectionSourceMapIds.includes("target_sourcemap_rust"), true);
 assert.equal(targetProjectionBundle.conversionPlan.metadata.authoredFrontierSource.targetProjectionLossIds.includes("loss_borrow"), true);
 assert.equal(targetProjectionBundle.conversionPlan.metadata.authoredFrontierSource.targetProjectionMissingEvidence.includes("browser-runtime-proof"), true);
+assert.equal(targetProjectionBundle.conversionPlan.metadata.authoredFrontierSource.targetProjectionReadinesses.includes("needs-review"), true);

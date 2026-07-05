@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { compileFrontierSourceBundle, inspectFrontierSourceSyntax } from "../dist/index.js";
+import { compileFrontierSourceBundle, inspectFrontierSourceSyntax, parseFrontierSource } from "../dist/index.js";
 
 const source = `module SyntaxProbe @id("mod_syntax_probe") {
 view TodoView @id("view_todo") {
@@ -17,6 +17,27 @@ assert.equal(syntaxReport.kind, "frontier.lang.sourceSyntaxReport");
 assert.equal(syntaxReport.summary.diagnosticCount, 0);
 assert.equal(syntaxReport.summary.failClosed, false);
 assert.equal(syntaxReport.metadata.sourceBytes, new TextEncoder().encode(source).length);
+
+const spanDoc = parseFrontierSource(`module SpanProbe @id("mod_span_probe") {
+packageManifest AppPackage @id("pkg_manifest_app") {
+  dependency react @id("pkg_dep_react") section dependencies range ^19.0.0 sourceSpan package.json:12:3-12:22
+}
+canvasSurface PreviewCanvas @id("canvas_surface_preview") {
+  command fill @id("canvas_command_fill") name fillRect category draw sourceSpan src/draw.js:4:1-4:20
+}
+appHost WorkbenchHost @id("app_surface_workbench") {
+  mount dashboard @id("app_mount_dashboard") kind region path /dashboard sourceSpan app.tsx:10:1-10:30
+}
+}`, { sourcePath: "umbrella-source-spans.frontier" });
+const spanDependency = spanDoc.metadata.packageManifests.manifests[0].records.find((record) => record.id === "pkg_dep_react");
+const spanCommand = spanDoc.metadata.canvasSurfaces.surfaces[0].records.find((record) => record.id === "canvas_command_fill");
+const spanMount = spanDoc.metadata.applicationSurfaces.surfaces[0].records.find((record) => record.id === "app_mount_dashboard");
+assert.equal(spanDependency.sourceSpan.path, "package.json");
+assert.equal(spanDependency.authoredSourceSpan.path, "umbrella-source-spans.frontier");
+assert.equal(spanCommand.sourceSpan.path, "src/draw.js");
+assert.equal(spanCommand.authoredSourceSpan.path, "umbrella-source-spans.frontier");
+assert.equal(spanMount.sourceSpan.path, "app.tsx");
+assert.equal(spanMount.authoredSourceSpan.path, "umbrella-source-spans.frontier");
 
 const malformedBundle = compileFrontierSourceBundle(`module Broken @id("mod_broken") {
 entity Todo @id("ent_todo") {

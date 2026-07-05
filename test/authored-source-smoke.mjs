@@ -52,6 +52,8 @@ const authoredArtifacts = createUniversalConversionArtifactsFromFrontierSource(a
   targets: ["rust"]
 });
 assert.equal(authoredArtifacts.metadata.authoredFrontierSource.constraintSpaceSummary.admissionCount, 1);
+const authoredConstraintParity = createAuthoredFrontierSourceParityMatrix({ plan: authoredPlan, includeEmptyRows: false });
+assert.equal(rowFor(authoredConstraintParity, "constraintSpaces.failClosedIds").status, "pass");
 
 const decisionGraphSource = `module DecisionGraphProbe @id("mod_decision_graph_probe") {
 decisionGraph MergeReview @id("decision_graph_merge_review") {
@@ -250,10 +252,12 @@ const semanticEditParity = createAuthoredFrontierSourceParityMatrix({
 });
 assert.equal(semanticEditAuthored.semanticEditScriptIds.includes("script_projection"), true);
 assert.equal(semanticEditAuthored.semanticTransformIdentityHashes.includes("transform_hash_projection"), true);
+assert.equal(semanticEditAuthored.transformCrossLanguages.includes("true"), true);
 assert.equal(semanticEditAuthored.transformSourceMapIds.includes("source_map_projection"), true);
 assert.equal(semanticEditAuthored.targetProjectionIds.includes("target_projection_rust"), true);
 assert.equal(rowForEntry(semanticEditParity, "semanticOperations.operations.semanticKey", "semanticEditKeys").status, "pass");
 assert.equal(rowForEntry(semanticEditParity, "semanticOperations.operations.transformIdentityHash", "semanticTransformIdentityHashes").status, "pass");
+assert.equal(rowForEntry(semanticEditParity, "semanticOperations.transformCrossLanguages", "transformCrossLanguages").status, "pass");
 assert.equal(rowForEntry(semanticEditParity, "semanticOperations.operations.sourceMapIds", "transformSourceMapIds").status, "pass");
 assert.equal(rowForEntry(semanticEditParity, "semanticEditRecords.scriptIds", "semanticEditScriptIds").status, "pass");
 assert.equal(rowForEntry(semanticEditParity, "targetProjections.projectionContractIds", "targetProjectionIds").status, "pass");
